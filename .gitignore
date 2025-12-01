@@ -1,0 +1,18 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+_internal/
+apiSage50.7z
+exe/
+resultados/
+temp/
+s50info.exe
+uv.lock
+licencia.lic

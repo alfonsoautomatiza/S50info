@@ -1,0 +1,5 @@
+2025-11-30 20:11:47,752 - sage50 - INFO - log_info:256 - [conexion] Windows Auth disponible
+2025-11-30 20:11:47,755 - sage50 - DEBUG - log_debug:269 - [conexion] Driver auto-detectado: ODBC Driver 17 for SQL Server
+2025-11-30 20:11:47,755 - sage50 - DEBUG - log_debug:269 - [conexion] Intentando conexión a CUBA\SQLSAGE50
+2025-11-30 20:11:47,758 - sage50 - INFO - log_info:256 - [conexion] Conexión exitosa a CUBA\SQLSAGE50 (SQL Auth)
+2025-11-30 20:11:47,759 - sage50 - INFO - log_info:256 - [conexion] Conexión inicializada correctamente
