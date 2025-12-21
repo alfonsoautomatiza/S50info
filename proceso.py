@@ -58,7 +58,7 @@ class proceso:
             print(f"Comun  : {self.api.comunes}")
             print(f"Nombre : {self.api.NomComunes}")
             print(f"Letra  : {self.api.letracomu}")
-            print(f"Años   : {self.api.obtener_year_comunes()}")
+            print(f"Años   : {self.api.obtener_year_letra_nombre_comunes()}")
             # print(f"Version SQL {self.api._connection_manager.get_mssql_version()}")
             print(f"Version SQL {self.api._connection_manager.get_server_version()}")
             if para.clave is not None:
