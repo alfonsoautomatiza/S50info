@@ -37,7 +37,7 @@ a = Analysis(
     binaries=binaries,
     datas=[],
     hiddenimports=['json', 'configparser',"exportador_resultados","pandas","openpyxl",
-                   'xml.etree.ElementTree',
+                   'xml.etree.ElementTree',"sqlparse","typer",
                    'webbrowser', 'pyodbc', 'libwertyconfig', 'libwertylog', 'libwertymail',
                    'cryptography.fernet', 'httpx', 'psutil',"cryptography.hazmat.bindings._rust",
                    'clr', 'http.server', 'requests_oauthlib', 'email.mime', 'email.mime.text',

@@ -3,20 +3,30 @@ Módulo de exportación avanzada de resultados para SAGE50
 Soporta múltiples formatos: Excel, JSON, CSV, XML, TXT
 Incluye compresión y plantillas personalizables
 """
+# --- Parche compatibilidad numpy / openpyxl ---
+import numpy as np
 
-import json
+# En numpy 1.26 esto ya existe; en numpy 2.x lo creamos
+if not hasattr(np, "short"):
+    np.short = np.int16
+# Puedes añadir otros si algún día hicieran falta:
+# if not hasattr(np, "int"):
+#     np.int = int
+
+# ----------------------------------------------
 import csv
-import zipfile
+import json
+import logging
+import subprocess
 import xml.etree.ElementTree as ET
+import zipfile
 from datetime import datetime
 from pathlib import Path
-from typing import List, Dict, Any, Optional, Union
-import subprocess
-import logging
-import shutil
+from typing import Any
 
 try:
     import pandas as pd
+
     PANDAS_AVAILABLE = True
 except ImportError:
     PANDAS_AVAILABLE = False
@@ -24,6 +34,7 @@ except ImportError:
 
 try:
     import openpyxl
+
     OPENPYXL_AVAILABLE = True
 except ImportError:
     OPENPYXL_AVAILABLE = False
@@ -38,13 +49,15 @@ class ExportadorResultados:
         self.directorio_salida.mkdir(exist_ok=True)
         self.logger = logging.getLogger(__name__)
 
-    def exportar(self,
-                 datos: List[Dict[str, Any]],
-                 formato: str = "txt",
-                 nombre_archivo: Optional[str] = None,
-                 plantilla: Optional[str] = None,
-                 comprimir: bool = False,
-                 abrir_archivo: bool = True) -> str:
+    def exportar(
+        self,
+        datos: list[dict[str, Any]],
+        formato: str = "txt",
+        nombre_archivo: str | None = None,
+        plantilla: str | None = None,
+        comprimir: bool = False,
+        abrir_archivo: bool = True,
+    ) -> str:
         """
         Método principal de exportación
 
@@ -69,16 +82,18 @@ class ExportadorResultados:
 
         # Exportar según formato
         exportadores = {
-            'txt': self._exportar_txt,
-            'csv': self._exportar_csv,
-            'json': self._exportar_json,
-            'xml': self._exportar_xml,
-            'excel': self._exportar_excel,
-            'xlsx': self._exportar_excel
+            "txt": self._exportar_txt,
+            "csv": self._exportar_csv,
+            "json": self._exportar_json,
+            "xml": self._exportar_xml,
+            "excel": self._exportar_excel,
+            "xlsx": self._exportar_excel,
         }
 
         if formato.lower() not in exportadores:
-            raise ValueError(f"Formato no soportado: {formato}. Formatos disponibles: {list(exportadores.keys())}")
+            raise ValueError(
+                f"Formato no soportado: {formato}. Formatos disponibles: {list(exportadores.keys())}"
+            )
 
         # Exportar datos
         ruta_archivo = exportadores[formato.lower()](datos, nombre_archivo, plantilla)
@@ -94,7 +109,9 @@ class ExportadorResultados:
         self.logger.info(f"Datos exportados exitosamente a: {ruta_archivo}")
         return str(ruta_archivo)
 
-    def _exportar_txt(self, datos: List[Dict[str, Any]], nombre_archivo: str, plantilla: Optional[str] = None) -> Path:
+    def _exportar_txt(
+        self, datos: list[dict[str, Any]], nombre_archivo: str, plantilla: str | None = None
+    ) -> Path:
         """Exportar a formato de texto tabulado"""
         ruta_archivo = self.directorio_salida / f"{nombre_archivo}.txt"
 
@@ -124,7 +141,9 @@ class ExportadorResultados:
 
         return ruta_archivo
 
-    def _exportar_csv(self, datos: List[Dict[str, Any]], nombre_archivo: str, plantilla: Optional[str] = None) -> Path:
+    def _exportar_csv(
+        self, datos: list[dict[str, Any]], nombre_archivo: str, plantilla: str | None = None
+    ) -> Path:
         """Exportar a formato CSV"""
         ruta_archivo = self.directorio_salida / f"{nombre_archivo}.csv"
 
@@ -140,7 +159,9 @@ class ExportadorResultados:
 
         return ruta_archivo
 
-    def _exportar_json(self, datos: List[Dict[str, Any]], nombre_archivo: str, plantilla: Optional[str] = None) -> Path:
+    def _exportar_json(
+        self, datos: list[dict[str, Any]], nombre_archivo: str, plantilla: str | None = None
+    ) -> Path:
         """Exportar a formato JSON"""
         ruta_archivo = self.directorio_salida / f"{nombre_archivo}.json"
 
@@ -149,9 +170,9 @@ class ExportadorResultados:
             "metadatos": {
                 "fecha_generacion": datetime.now().isoformat(),
                 "total_registros": len(datos),
-                "campos": list(datos[0].keys()) if datos else []
+                "campos": list(datos[0].keys()) if datos else [],
             },
-            "datos": datos
+            "datos": datos,
         }
 
         with open(ruta_archivo, "w", encoding="utf-8") as f:
@@ -159,7 +180,9 @@ class ExportadorResultados:
 
         return ruta_archivo
 
-    def _exportar_xml(self, datos: List[Dict[str, Any]], nombre_archivo: str, plantilla: Optional[str] = None) -> Path:
+    def _exportar_xml(
+        self, datos: list[dict[str, Any]], nombre_archivo: str, plantilla: str | None = None
+    ) -> Path:
         """Exportar a formato XML"""
         ruta_archivo = self.directorio_salida / f"{nombre_archivo}.xml"
 
@@ -186,7 +209,9 @@ class ExportadorResultados:
 
         return ruta_archivo
 
-    def _exportar_excel(self, datos: List[Dict[str, Any]], nombre_archivo: str, plantilla: Optional[str] = None) -> Path:
+    def _exportar_excel(
+        self, datos: list[dict[str, Any]], nombre_archivo: str, plantilla: str | None = None
+    ) -> Path:
         """Exportar a formato Excel"""
         ruta_archivo = self.directorio_salida / f"{nombre_archivo}.xlsx"
 
@@ -197,26 +222,28 @@ class ExportadorResultados:
         df = pd.DataFrame(datos)
 
         # Crear writer con opciones
-        with pd.ExcelWriter(ruta_archivo, engine='openpyxl') as writer:
+        with pd.ExcelWriter(ruta_archivo, engine="openpyxl") as writer:
             # Hoja principal de datos
-            df.to_excel(writer, sheet_name='Datos', index=False)
+            df.to_excel(writer, sheet_name="Datos", index=False)
 
             # Hoja de metadatos
             metadatos = {
-                'Propiedad': ['Fecha de generación', 'Total de registros', 'Columnas'],
-                'Valor': [
+                "Propiedad": ["Fecha de generación", "Total de registros", "Columnas"],
+                "Valor": [
                     datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                     len(df),
-                    ', '.join(df.columns.tolist())
-                ]
+                    ", ".join(df.columns.tolist()),
+                ],
             }
-            pd.DataFrame(metadatos).to_excel(writer, sheet_name='Metadatos', index=False)
+            pd.DataFrame(metadatos).to_excel(writer, sheet_name="Metadatos", index=False)
 
         return ruta_archivo
 
-    def _aplicar_plantilla_txt(self, datos: List[Dict[str, Any]], ruta_archivo: Path, plantilla: str) -> Path:
+    def _aplicar_plantilla_txt(
+        self, datos: list[dict[str, Any]], ruta_archivo: Path, plantilla: str
+    ) -> Path:
         """Aplicar plantilla personalizada para formato TXT"""
-        with open(plantilla, "r", encoding="utf-8") as f:
+        with open(plantilla, encoding="utf-8") as f:
             plantilla_content = f.read()
 
         # Reemplazar marcadores de posición
@@ -231,7 +258,9 @@ class ExportadorResultados:
             # Reemplazar campos dinámicos
             for clave, valor in diccionario.items():
                 marcador = "{" + clave.upper() + "}"
-                registro_plantilla = registro_plantilla.replace(marcador, str(valor) if valor is not None else "")
+                registro_plantilla = registro_plantilla.replace(
+                    marcador, str(valor) if valor is not None else ""
+                )
 
             resultado.append(registro_plantilla)
 
@@ -242,9 +271,9 @@ class ExportadorResultados:
 
     def _comprimir_archivo(self, ruta_archivo: Path) -> Path:
         """Comprimir archivo en formato ZIP"""
-        ruta_zip = ruta_archivo.with_suffix('.zip')
+        ruta_zip = ruta_archivo.with_suffix(".zip")
 
-        with zipfile.ZipFile(ruta_zip, 'w', zipfile.ZIP_DEFLATED) as zf:
+        with zipfile.ZipFile(ruta_zip, "w", zipfile.ZIP_DEFLATED) as zf:
             zf.write(ruta_archivo, ruta_archivo.name)
 
         # Eliminar archivo original
@@ -255,16 +284,16 @@ class ExportadorResultados:
     def _abrir_archivo(self, ruta_archivo: Path):
         """Abrir archivo con aplicación predeterminada"""
         try:
-            if ruta_archivo.suffix.lower() == '.csv':
-                subprocess.Popen(['notepad.exe', str(ruta_archivo)])
-            elif ruta_archivo.suffix.lower() in ['.xlsx', '.xls']:
-                subprocess.Popen(['start', 'excel', str(ruta_archivo)], shell=True)
-            elif ruta_archivo.suffix.lower() == '.json':
-                subprocess.Popen(['notepad.exe', str(ruta_archivo)])
-            elif ruta_archivo.suffix.lower() == '.xml':
-                subprocess.Popen(['notepad.exe', str(ruta_archivo)])
+            if ruta_archivo.suffix.lower() == ".csv":
+                subprocess.Popen(["notepad.exe", str(ruta_archivo)])
+            elif ruta_archivo.suffix.lower() in [".xlsx", ".xls"]:
+                subprocess.Popen(["start", "excel", str(ruta_archivo)], shell=True)
+            elif ruta_archivo.suffix.lower() == ".json":
+                subprocess.Popen(["notepad.exe", str(ruta_archivo)])
+            elif ruta_archivo.suffix.lower() == ".xml":
+                subprocess.Popen(["notepad.exe", str(ruta_archivo)])
             else:
-                subprocess.Popen(['notepad.exe', str(ruta_archivo)])
+                subprocess.Popen(["notepad.exe", str(ruta_archivo)])
         except Exception as e:
             self.logger.warning(f"No se pudo abrir el archivo {ruta_archivo}: {e}")
 
@@ -299,10 +328,9 @@ Campos del registro:
 
 
 # Función de conveniencia para uso rápido
-def exportar_resultados(datos: List[Dict[str, Any]],
-                       formato: str = "txt",
-                       nombre_archivo: Optional[str] = None,
-                       **kwargs) -> str:
+def exportar_resultados(
+    datos: list[dict[str, Any]], formato: str = "txt", nombre_archivo: str | None = None, **kwargs
+) -> str:
     """
     Función de conveniencia para exportar resultados rápidamente
 
