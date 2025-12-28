@@ -3,19 +3,18 @@ import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 
-import libsage50
 import libwertyconfig
 
 from exportador_resultados import ExportadorResultados
 
 
 class proceso:
-    def __init__(self, para, app="S02"):
+    def __init__(self, para,api, app="S02"):
         lic = []
 
         # Función para verificar carencia basada en config.ini
 
-        self.api = libsage50.apiSAGE50(para=para, carencia_check=True, app=app)
+        self.api = api
         self.exportador = ExportadorResultados()
         if not getattr(self.api, "lconecto", False):
             try:
@@ -147,14 +146,4 @@ class proceso:
             print(f"{error}")
 
 
-    def reset(self):
-        print("-" * 30, "LISTA EMPRESAS", "-" * 30)
-        a = self.api.sql_to_dict(
-            "SELECT  CODIGO,NOMBRE,PRIPAL  FROM EUROWINSYS.dbo.gruposemp where pripal = 1"
-        )
-        codigo = a[0]["CODIGO"]
 
-        pprint.pprint(a)
-        self.api.execute_query(f'truncate table "COMU{codigo}"."dbo".connect;',commit=True)
-        self.api.execute_query('truncate table "EUROWINSYS"."dbo".log_analisis;',commit=True)
-        self.api.execute_query('truncate table "EUROWINSYS"."dbo".log_error;',commit=True)

@@ -4,7 +4,8 @@
       "Bash(python:*)",
       "Bash(uv add:*)",
       "Bash(del:*)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(test:*)"
     ],
     "deny": [],
     "ask": []
