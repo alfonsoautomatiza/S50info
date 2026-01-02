@@ -1,15 +1,14 @@
 import pprint
 import sys
-from datetime import datetime, timedelta
 from pathlib import Path
-
+import libsage50
 import libwertyconfig
 
 from exportador_resultados import ExportadorResultados
 
 
 class proceso:
-    def __init__(self, para,api, app="S02"):
+    def __init__(self, para, api, app="S02"):
         lic = []
 
         # Función para verificar carencia basada en config.ini
@@ -31,8 +30,6 @@ class proceso:
         config_path = base_dir / "config.ini"
         try:
             if config_path.exists():
-
-
                 if libwertyconfig.check_carencia():
                     lic = [True]
                     licencia = "Carencia licencia"
@@ -114,7 +111,7 @@ class proceso:
             print(f"Error al exportar resultados: {e}")
             return False
 
-    def sqltodic(self, sql, formato="txt", nombre_archivo=None, plantilla=None, comprimir=False):
+    def sql2doc(self, sql, formato="txt", nombre_archivo=None, plantilla=None, comprimir=False):
         """
         Ejecuta consulta SQL y exporta resultados
 
@@ -133,11 +130,9 @@ class proceso:
 
     def sql(self, sql):
         try:
-            revisa=self.api.build_query(sql_template=sql,
-                                            years=self.api.SAGE50year("*"))
+            revisa = self.api.build_query(sql_template=sql, years=self.api.SAGE50year("*"))
 
-
-            self.api.execute_query(revisa,commit=True)
+            self.api.execute_query(revisa, commit=True)
             print("SQL VALIDO:")
             print(revisa)
 
@@ -145,5 +140,6 @@ class proceso:
             print("Fallo en sql")
             print(f"{error}")
 
-
-
+    def reset_log(self):
+        self.api.execute_query('truncate table "EUROWINSYS"."dbo".log_analisis;', commit=True)
+        self.api.execute_query('truncate table "EUROWINSYS"."dbo".log_error;', commit=True)

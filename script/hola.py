@@ -1,10 +1,12 @@
 """Ejemplo de script externo que usa cliente_sage50."""
 
-api.execute_query("""
-TRUNCATE TABLE [eurowinsys].[dbo].[log_analisis];
-TRUNCATE TABLE [eurowinsys].[dbo].[log_error];
-                  """)
 
+proceso.reset_log()
+input("pulse para generar el excel")
 
-api.execute_query("""
+a=proceso.api.execute_query("""
+        select libreria,TEMPSACUMULAT,CONSULTA
+ from "EUROWINSYS"."dbo".log_analisis;
                   """)
+proceso.imprimir_diccionarios(a,formato="xlsx")
+pass

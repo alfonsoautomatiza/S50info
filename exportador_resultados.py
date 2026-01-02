@@ -3,6 +3,7 @@ Módulo de exportación avanzada de resultados para SAGE50
 Soporta múltiples formatos: Excel, JSON, CSV, XML, TXT
 Incluye compresión y plantillas personalizables
 """
+
 # --- Parche compatibilidad numpy / openpyxl ---
 import numpy as np
 

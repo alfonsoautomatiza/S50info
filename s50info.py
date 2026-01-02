@@ -14,7 +14,14 @@ from rich.panel import Panel
 
 import proceso
 
-app = typer.Typer(add_completion=False, help="Herramienta para ejecutar SQL y procesos Sage50")
+app = typer.Typer(
+    add_completion=False,
+    context_settings={"help_option_names": ["-h", "--help"]},
+    help="""S50Info - Herramienta de administración para bases de datos Sage50
+
+Permite ejecutar consultas SQL, scripts Python, y operaciones de mantenimiento sobre bases de datos Sage50.
+"""
+)
 console = Console()
 
 
@@ -25,16 +32,16 @@ def get_params(**kwargs):
 
 @app.command()
 def main(
-    script: str | None = typer.Argument(
-        None, help="Ejecutar script/carpeta Python (archivo .py o carpeta con scripts)"
-    ),
+    # script: str | None = typer.Argument(
+    #     None, help="Ejecutar script/carpeta Python (archivo .py o carpeta con scripts)"
+    # ),
     noupdate: str | None = typer.Option(None, "--noupdate", "-no", help="No actualiza y el motivo"),
     sql: str | None = typer.Option(None, "--sql", "-s", help="Ejecucion codigo sql"),
     clave: str | None = typer.Option(
         None, "--clave", "-c", help="Obtiene la clave Sage50 sql desde LICENCIA SAGE50"
     ),
     sqltodic: str | None = typer.Option(
-        None, "--sqltodic", "-d", help="Ejecucion codigo sql para dic"
+        None, "--sql2doc", "-d", help="Ejecucion codigo sql para dic"
     ),
     formato: str = typer.Option(
         "txt", "--formato", "-f", help="Formato de exportación de resultados"
@@ -51,9 +58,83 @@ def main(
     exec_script: str | None = typer.Option(
         None, "--exe", "-e", help="Ejecutar un fichero python externo"
     ),
+    reset_log: str | None = typer.Option(
+        None, "--reset", "-r", help="Ejecutar un fichero python externo"
+    ),
 ):
     """
-    Herramienta para ejecutar procesos y consultas SQL en Sage50.
+    ===============================================================================
+    EJECUCION DE PROCESOS Y CONSULTAS SQL EN SAGE50
+    ===============================================================================
+
+    Esta herramienta permite realizar multiples operaciones sobre bases de datos Sage50:
+
+    -------------------------------------------------------------------------------
+    FUNCIONALIDADES PRINCIPALES:
+    -------------------------------------------------------------------------------
+
+    - Ejecucion de consultas SQL (--sql, -s)
+      Ejecuta codigo SQL y muestra resultados por pantalla
+
+    - Exportacion de SQL a diferentes formatos (--sqltodic, -d)
+      Exporta resultados a TXT (con plantillas), Excel, JSON, CSV, HTML
+      Opciones de formato: txt, xlsx, json, csv, html
+
+    - Obtencion de clave SQL Sage50 (--clave, -c)
+      Recupera la clave de acceso SQL desde la licencia de SAGE50
+
+    - Ejecucion de scripts Python externos (--exe, -e)
+      Permite ejecutar archivos .py o carpetas con scripts personalizados
+      Los scripts tienen acceso al objeto 'proceso' para interactuar con SAGE50
+
+    - Control de actualizaciones (--noupdate, -no)
+      Desactiva la verificacion de actualizaciones y especifica el motivo
+
+    -------------------------------------------------------------------------------
+    FORMATOS DE EXPORTACION:
+    -------------------------------------------------------------------------------
+      --formato, -f : txt (default) | xlsx | json | csv | html
+      --output, -o  : Nombre base del archivo de salida (sin extension)
+      --plantilla, -t : Ruta a plantilla personalizada para formato TXT
+      --comprimir, -z : Comprime el resultado en formato ZIP
+
+    -------------------------------------------------------------------------------
+    EJEMPLOS DE USO:
+    -------------------------------------------------------------------------------
+
+      # obtiene una consulta SQL en formato SAGE50 para el comunes activo.
+      s50info --sql "SELECT * FROM GESTION!CLIENTES"
+
+      # Exportar SQL a Excel
+      s50info --sql2doc "SELECT * FROM ARTICULOS" --formato xlsx --output articulos
+
+      # Exportar con plantilla personalizada y comprimir
+      s50info -d "SELECT * FROM ALBARANES" -f txt -t plantilla.txt -o reporte -z
+
+      # Obtener clave SQL de SAGE50
+      s50info --clave
+
+      # Ejecutar script Python externo
+      s50info --exe mi_script.py
+
+      # Ejecutar todos los scripts de una carpeta
+      s50info --exe ./mis_scripts/
+
+      # Desactivar actualizaciones
+      s50info --sql "SELECT 1" --noupdate "En desarrollo"
+
+    -------------------------------------------------------------------------------
+    ARCHIVOS DE CONFIGURACION:
+    -------------------------------------------------------------------------------
+      config.ini : Parametros de conexion a base de datos (servidor, credenciales, ODBC)
+
+    -------------------------------------------------------------------------------
+    REQUISITOS:
+    -------------------------------------------------------------------------------
+      - Conexion activa a SAGE50
+      - Credenciales validas de SQL Server
+
+
     """
 
     # 0. Crear objeto API (PRIMERO - requisito para todo)
@@ -88,6 +169,20 @@ def main(
             rprint(f"[dim]Buscando en:[/dim] {abs_path}")
             return
 
+        # Crear objeto proceso para pasarlo al script
+        rprint("[dim]Inicializando proceso...[/dim]")
+        para = get_params(
+            noupdate=noupdate,
+            sql=sql,
+            clave=clave,
+            sqltodic=sqltodic,
+            formato=formato,
+            output=output,
+            plantilla=plantilla,
+            comprimir=comprimir,
+        )
+        proceso_obj = proceso.proceso(para, api=api_obj)
+
         # Si es un directorio, ejecutar todos los archivos .py
         if path.is_dir():
             rprint(
@@ -112,7 +207,7 @@ def main(
                     script_globals = {
                         "__name__": "__main__",
                         "__file__": str(script_file),
-                        "api": api_obj,
+                        "proceso": proceso_obj,
                     }
                     runpy.run_path(
                         str(script_file), init_globals=script_globals, run_name="__main__"
@@ -138,7 +233,11 @@ def main(
                 )
             )
             try:
-                script_globals = {"__name__": "__main__", "__file__": exec_script, "api": api_obj}
+                script_globals = {
+                    "__name__": "__main__",
+                    "__file__": exec_script,
+                    "proceso": proceso_obj,
+                }
                 runpy.run_path(exec_script, init_globals=script_globals, run_name="__main__")
             except Exception as e:
                 rprint(f"[bold red]Error al ejecutar el script {exec_script}:[/bold red] {e}")
@@ -169,12 +268,12 @@ def main(
 
     # 4. Inicializar Proceso
     rprint("[dim]Inicializando proceso...[/dim]")
-    tarea = proceso.proceso(para,api=api_obj)
+    tarea = proceso.proceso(para, api=api_obj)
 
     try:
         if sqltodic is not None:
             rprint(f"[bold cyan]Ejecutando SQL export a {formato}...[/bold cyan]")
-            tarea.sqltodic(
+            tarea.sql2doc(
                 sqltodic,
                 formato=formato,
                 nombre_archivo=output,
@@ -183,7 +282,7 @@ def main(
             )
 
         if sql is not None:
-            rprint("[bold cyan]Ejecutando SQL...[/bold cyan]")
+            rprint("[bold cyan]Obteniendo SQL...[/bold cyan]")
             tarea.sql(sql)
 
     except Exception as e:

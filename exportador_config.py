@@ -3,20 +3,20 @@ Configuración y utilidades para el módulo de exportación
 """
 
 import json
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Dict, Any, Optional
-from dataclasses import dataclass, asdict
 
 
 @dataclass
 class ExportConfig:
     """Configuración de exportación"""
+
     formato_defecto: str = "txt"
     directorio_salida: str = "resultados"
     comprimir_defecto: bool = False
     abrir_archivo_defecto: bool = True
     dias_limpiar_resultados: int = 7
-    plantilla_defecto: Optional[str] = None
+    plantilla_defecto: str | None = None
 
     # Configuraciones por formato
     csv_delimitador: str = ","
@@ -45,7 +45,7 @@ class ConfigManager:
         """Cargar configuración desde archivo"""
         if self.config_file.exists():
             try:
-                with open(self.config_file, "r", encoding="utf-8") as f:
+                with open(self.config_file, encoding="utf-8") as f:
                     data = json.load(f)
                 return ExportConfig(**data)
             except Exception as e:

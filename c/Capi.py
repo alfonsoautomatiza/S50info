@@ -54,7 +54,7 @@ for root, dirs, files in os.walk(api_sage50_dir):
             module_name = os.path.splitext(rel_path)[0].replace(os.sep, ".")
             extensions.append(Extension(module_name, [abs_path]))
 
-destino_carpeta_c = "e:\\c"
+destino_carpeta_c = "c:\\c"
 exe_dir = "exe"
 
 # Asegurar que el directorio exe existe (setup lo creará, pero por si acaso)
