@@ -1,0 +1,6 @@
+# Ignorar todo
+*
+
+# Excepto estos archivos
+!README.md
+!.gitignore
