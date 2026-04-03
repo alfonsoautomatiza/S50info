@@ -1,0 +1,14 @@
+Page,Meta description
+https://wertymsd.github.io/s50info/,Aplicación S50info automatice Sage50 desde su consola.
+https://wertymsd.github.io/s50info/conexion-con-sage50/,"Aprende a conectar SAGE50 BI a tu base de datos SQL paso a paso. Configura servidor, usuario y selecciona la base de datos fácilmente."
+https://wertymsd.github.io/s50info/inicio-rapido-s50info/,
+https://wertymsd.github.io/s50info/link-descarga/,Descarga gratuita del programa para fichero compatible con SAGE50
+https://wertymsd.github.io/s50info/param_clave/,Obtén la clave acceso SQL de SAGE50
+https://wertymsd.github.io/s50info/param_comprimir/,informes comprimida por seguridad
+https://wertymsd.github.io/s50info/param_exe/,Automatice el día a día de SAGE50
+https://wertymsd.github.io/s50info/param_formato/,El parámetro --formato (o alias -f) especifica el formato del archivo de salida generado por la opción sql2doc.
+https://wertymsd.github.io/s50info/param_output/,Parámetro directorio salida para su consulta
+https://wertymsd.github.io/s50info/param_plantilla/,El parámetro --plantilla (o alias -t) permite especificar la ruta a un archivo de plantilla personalizado cuando se exportan datos en formato txt.
+https://wertymsd.github.io/s50info/param_reset/,Resteo de LOG
+https://wertymsd.github.io/s50info/param_sql/,Obtenga el SQL correcto desde su consola para los años SAGE50
+https://wertymsd.github.io/s50info/param_sqltodic/,El parámetro --sql2doc  es la función principal de exportación de S50Info. Permite ejecutar una consulta SQL y guardar el resultado en un archivo con un formato específico.
