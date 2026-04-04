@@ -1045,10 +1045,32 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#alcance-real-de-integracion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Alcance real de integracion
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#formatos-recomendados-por-destino" class="md-nav__link">
     <span class="md-ellipsis">
       
         Formatos recomendados por destino
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#modelo-aspiracional-y-realista" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modelo aspiracional y realista
       
     </span>
   </a>
@@ -1270,10 +1292,32 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#alcance-real-de-integracion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Alcance real de integracion
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#formatos-recomendados-por-destino" class="md-nav__link">
     <span class="md-ellipsis">
       
         Formatos recomendados por destino
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#modelo-aspiracional-y-realista" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modelo aspiracional y realista
       
     </span>
   </a>
@@ -1320,7 +1364,18 @@
 
 
 <h1 id="integraciones">Integraciones<a class="headerlink" href="#integraciones" title="Permanent link">&para;</a></h1>
-<p>S50Info facilita integraciones a traves de exportaciones estructuradas y ejecucion de scripts.</p>
+<p>S50Info facilita integraciones ligeras mediante exportaciones estructuradas y ejecucion de scripts. La propuesta es pragmatica: resolver intercambio de datos con bajo coste operativo y sin complejidad innecesaria.</p>
+<div class="admonition info">
+<p class="admonition-title">Punto de partida</p>
+<p>La herramienta es gratuita, asi que puedes validar un flujo real de integracion antes de plantear despliegues mas amplios.</p>
+</div>
+<h2 id="alcance-real-de-integracion">Alcance real de integracion<a class="headerlink" href="#alcance-real-de-integracion" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Exportaciones en formatos compatibles (<code>csv</code>, <code>json</code>, <code>xlsx</code>, <code>txt</code>, <code>html</code>).</li>
+<li>Scripts Python para preparar, transformar o encadenar procesos.</li>
+<li>Conexion con procesos externos ya existentes (ETL sencillo, cargas intermedias, validaciones).</li>
+</ul>
+<p>No pretende ser una plataforma iPaaS: su fortaleza es la operativa tecnica, directa y trazable.</p>
 <h2 id="formatos-recomendados-por-destino">Formatos recomendados por destino<a class="headerlink" href="#formatos-recomendados-por-destino" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -1357,6 +1412,33 @@
 <p class="admonition-title">Clave de integracion</p>
 <p>Estandariza nombres de archivo, rutas y periodicidad para evitar variaciones.</p>
 </div>
+<h2 id="modelo-aspiracional-y-realista">Modelo aspiracional y realista<a class="headerlink" href="#modelo-aspiracional-y-realista" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Nivel</th>
+<th>En que consiste</th>
+<th>Beneficio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Nivel 1 - Exportacion fiable</td>
+<td>Consulta de lectura + fichero estructurado</td>
+<td>Entrega rapida sin friccion</td>
+</tr>
+<tr>
+<td>Nivel 2 - Proceso repetible</td>
+<td>Script + planificacion + control de salida</td>
+<td>Menor carga manual</td>
+</tr>
+<tr>
+<td>Nivel 3 - Flujo coordinado</td>
+<td>Integracion con receptor externo y validacion de cierre</td>
+<td>Operativa estable entre sistemas</td>
+</tr>
+</tbody>
+</table>
 <h2 id="ruta-tipo-de-integracion">Ruta tipo de integracion<a class="headerlink" href="#ruta-tipo-de-integracion" title="Permanent link">&para;</a></h2>
 <pre class="mermaid"><code>flowchart LR
     A[Consulta de lectura] --&gt; B[Exportacion estructurada]
@@ -1368,7 +1450,12 @@
 <li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Acordar nomenclatura de salida</li>
 <li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Validar muestra inicial</li>
 <li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Establecer control de ejecucion</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Registrar responsable de seguimiento</li>
 </ul>
+<div class="admonition tip">
+<p class="admonition-title">Buenas expectativas</p>
+<p>Empieza por una integracion concreta de alto impacto y baja complejidad. Cuando ese flujo sea estable, replica el patron en otros procesos.</p>
+</div>
 <p><a class="md-button" href="../operativa-programada/">Ver operativa programada</a></p>
 
 
