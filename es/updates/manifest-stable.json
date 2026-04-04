@@ -1,18 +1,19 @@
 {
   "project": "s50info",
   "channel": "stable",
-  "latest": "2.0.0",
+  "latest": "2.0.1",
   "key_id": "global-2026-01",
-  "generated_at": "2026-04-03T21:04:06.068395+00:00",
+  "generated_at": "2026-04-04T20:41:19.761844+00:00",
   "releases": [
     {
-      "version": "2.0.0",
-      "type": "full",
+      "version": "2.0.1",
+      "type": "partial",
       "target": "win-x64",
-      "url": "https://github.com/wertyMSD/manual-s50info/releases/download/v2.0.0/S50info.zip",
-      "sha256": "c34b127993b36f8784caaddeb9654e3f0a36e3f482523db4aebadc3da32ed20d",
-      "size": 74256454
+      "url": "files/v2.0.1.zip",
+      "sha256": "c43dd68de6d2f0735bd5c301ca60623c90c12ee7e5f26b49403ccde637797697",
+      "size": 94181,
+      "operations_manifest": "operations.json"
     }
   ],
-  "signature": "STvp2vqIF7vWYIzbIZgCyfI/4e8yM1vfGazf6zNoUIrZoJ2qucpumK3G7OTxlyYinmodjVSYfPxNkba7ilYdAw=="
+  "signature": "/r7kAJ/UoyHHyGiFsLfEMb4imZy1+no9S6TV6bNE7IYY+lH72sts2pXH4RZX2A8u7AbXKgTZ7tCem1L5+asMAA=="
 }
