@@ -3,17 +3,17 @@
   "channel": "stable",
   "latest": "2.0.1",
   "key_id": "global-2026-01",
-  "generated_at": "2026-04-04T20:41:19.761844+00:00",
+  "generated_at": "2026-04-05T16:35:43.951861+00:00",
   "releases": [
     {
       "version": "2.0.1",
       "type": "partial",
       "target": "win-x64",
       "url": "files/v2.0.1.zip",
-      "sha256": "c43dd68de6d2f0735bd5c301ca60623c90c12ee7e5f26b49403ccde637797697",
-      "size": 94181,
+      "sha256": "846f8f07a0ab2bd3d56e263059c3d68bf48a027aae102ef8bd47b3b8fee8a35e",
+      "size": 94182,
       "operations_manifest": "operations.json"
     }
   ],
-  "signature": "/r7kAJ/UoyHHyGiFsLfEMb4imZy1+no9S6TV6bNE7IYY+lH72sts2pXH4RZX2A8u7AbXKgTZ7tCem1L5+asMAA=="
+  "signature": "GvkulFMhIWwQoBFudGzC5++x2FwVo7BPjq1XxzNpuVi+P9IvMB/Pfvs5CQ+3NQwx7U1IpxC8p9t83DQ15uyfCg=="
 }

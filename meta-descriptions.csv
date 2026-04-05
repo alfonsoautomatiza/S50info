@@ -1,8 +1,5 @@
 Page,Meta description
-https://wertymsd.github.io/s50info/,"Documentacion oficial de S50Info para soporte, consultas SQL de lectura, exportacion de datos y automatizacion en Sage50."
-https://wertymsd.github.io/s50info/api-crm/,"Guia para validar conexion, contexto operativo y autorizacion de uso de S50Info con entornos Sage50."
 https://wertymsd.github.io/s50info/casos-de-uso/,Estos casos de uso de S50Info muestran como equipos de Sage50 convierten tareas tecnicas dispersas en procesos operativos claros y repetibles.
-https://wertymsd.github.io/s50info/configuracion/,"Ajusta S50Info para soporte, exportacion e integraciones con una configuracion clara y estable en Sage50."
 https://wertymsd.github.io/s50info/crear-registros/,"Enfoque seguro para altas y actualizaciones mediante procesos externos o scripts Python, sin SQL de escritura directa."
 https://wertymsd.github.io/s50info/descarga/,Descarga S50Info desde la fuente oficial y valida una instalacion limpia para empezar a trabajar con Sage50.
 https://wertymsd.github.io/s50info/ejemplos-dia-a-dia/,"Ejemplos de uso diario de S50Info en Sage50 para resolver incidencias, exportar datos y ejecutar rutinas tecnicas."
