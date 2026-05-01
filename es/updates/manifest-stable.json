@@ -1,19 +1,19 @@
 {
   "project": "s50info",
   "channel": "stable",
-  "latest": "2.1.1",
+  "latest": "2.1.8",
   "key_id": "global-2026-01",
-  "generated_at": "2026-04-06T17:08:25.232256+00:00",
+  "generated_at": "2026-05-01T13:27:22.999295+00:00",
   "releases": [
     {
-      "version": "2.1.1",
+      "version": "2.1.8",
       "type": "partial",
       "target": "win-x64",
-      "url": "files/release.zip",
-      "sha256": "e5b1a9b9b769d728e6ea8b0615cfea14638c141ce4a89dce92440b3e11fd2c22",
-      "size": 3494,
+      "url": "files/s.zip",
+      "sha256": "c00863cb6235b0136e8369495d021a1e1e5e732a2df7d6115ff29716b71f1da4",
+      "size": 112437,
       "operations_manifest": "operations.json"
     }
   ],
-  "signature": "gSuMK90jBIssavVbDQBjPQmczATgDo2RJCPSLsteO9HuAZuv5wWgKdZZtylAyOUYAcvIjI3BceHFjgrvRQR0AA=="
+  "signature": "u4m47dIAtMPyGK3nbN6xGR5zcAFoHHDzjiz+BS6uKxkDPNsttMePYK2ibWUblmNLkZm5pKqMYxRptVWaxXqLAQ=="
 }
