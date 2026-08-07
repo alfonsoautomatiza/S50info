@@ -3,17 +3,16 @@
   "channel": "stable",
   "latest": "2.1.8",
   "key_id": "global-2026-01",
-  "generated_at": "2026-05-01T14:17:04.606760+00:00",
+  "generated_at": "2026-08-07T07:33:06.011991+00:00",
   "releases": [
     {
       "version": "2.1.8",
-      "type": "partial",
+      "type": "full",
       "target": "win-x64",
-      "url": "files/s.zip",
-      "sha256": "8c912f78f4bc9b540aee2825884bfd7f94011de444c3661a5081d085d87d85af",
-      "size": 112759,
-      "operations_manifest": "operations.json"
+      "url": "https://github.com/wertyMSD/s50info/releases/download/v2.1.8/s50info.zip",
+      "sha256": "8904f93bcf0cdcd6179c0275879b57ba8a3277de08a6044960dfb59c4ff932a9",
+      "size": 88281221
     }
   ],
-  "signature": "QOp95LSrDh9+w5wR4er/Z4lNGhA1DhKp079s7fig80qPj/tk/tvN/iHnTCI086xtJry3lqLHWAzh8lsmHG7SCg=="
+  "signature": "DSqLeAZj3mkfzwaf2/0bQac9yZsdB+8eStSc8CrO+ruiiejvNEwpUsLVCaCf3S5i5iIMRj0Go8XJpOhAcVRnCw=="
 }
