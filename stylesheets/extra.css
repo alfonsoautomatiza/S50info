@@ -1,0 +1,102 @@
+:root {
+  --s50-reading-width: 72ch;
+}
+
+.md-grid {
+  max-width: 90rem;
+}
+
+.md-content__inner {
+  max-width: var(--s50-reading-width);
+  margin-inline: auto;
+}
+
+.md-typeset {
+  font-size: 0.82rem;
+  line-height: 1.7;
+}
+
+.md-typeset h1 {
+  margin-bottom: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
+
+.md-typeset h2 {
+  margin-top: 2.4em;
+  margin-bottom: 0.8em;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+}
+
+.md-typeset h3 {
+  margin-top: 1.8em;
+}
+
+.md-typeset p,
+.md-typeset li {
+  text-wrap: pretty;
+}
+
+.md-typeset code {
+  overflow-wrap: anywhere;
+}
+
+.md-typeset .highlight,
+.md-typeset table:not([class]) {
+  margin-block: 1.25rem;
+}
+
+.md-typeset table:not([class]) {
+  display: table;
+  width: 100%;
+}
+
+.md-typeset .admonition,
+.md-typeset details {
+  font-size: inherit;
+}
+
+.md-typeset .md-button {
+  margin-top: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+:focus-visible {
+  outline: 3px solid var(--md-accent-fg-color);
+  outline-offset: 3px;
+}
+
+@media (max-width: 44.984375em) {
+  .md-typeset {
+    font-size: 0.78rem;
+    line-height: 1.65;
+  }
+
+  .md-typeset h1 {
+    font-size: 1.85rem;
+  }
+
+  .md-typeset table:not([class]) {
+    display: block;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+  }
+
+  .md-typeset .md-button {
+    display: block;
+    width: 100%;
+    margin-right: 0;
+    text-align: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

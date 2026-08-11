@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Manual técnico de S50Info para consultar, exportar y automatizar datos de Sage 50 desde la línea de comandos.">
+        <meta name="description" content="Aprende a consultar, exportar y automatizar datos de Sage 50 con S50Info, una CLI técnica para soporte e integración.">
       
       
         <meta name="author" content="AlfonsoAutomatiza">
@@ -14,23 +14,25 @@
       
       
       
+        <link rel="next" href="instalacion/">
+      
       
         
       
       
-      <link rel="icon" href="/img/hola.ico">
+      <link rel="icon" href="img/hola.ico">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>S50Info | Manual técnico de Sage 50</title>
+        <title>Manual técnico de S50Info para Sage 50 - S50Info | Manual técnico de Sage 50</title>
       
     
     
-      <link rel="stylesheet" href="/assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="/assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -49,9 +51,9 @@
       
     
     
-      <link rel="stylesheet" href="/stylesheets/extra.css">
+      <link rel="stylesheet" href="stylesheets/extra.css">
     
-    <script>__md_scope=new URL("/",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
   
@@ -71,11 +73,11 @@
   <meta property="og:locale" content="es_ES">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="S50Info | Manual técnico de Sage 50">
-  <meta property="og:title" content="">
-  <meta property="og:description" content="Manual técnico de S50Info para consultar, exportar y automatizar datos de Sage 50 desde la línea de comandos.">
+  <meta property="og:title" content="Manual técnico de S50Info para Sage 50">
+  <meta property="og:description" content="Aprende a consultar, exportar y automatizar datos de Sage 50 con S50Info, una CLI técnica para soporte e integración.">
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="">
-  <meta name="twitter:description" content="Manual técnico de S50Info para consultar, exportar y automatizar datos de Sage 50 desde la línea de comandos.">
+  <meta name="twitter:title" content="Manual técnico de S50Info para Sage 50">
+  <meta name="twitter:description" content="Aprende a consultar, exportar y automatizar datos de Sage 50 con S50Info, una CLI técnica para soporte e integración.">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -107,6 +109,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#consulta-y-automatiza-sage-50-desde-la-linea-de-comandos" class="md-skip">
+          Saltar a contenido
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -119,9 +126,9 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Cabecera">
-    <a href="/." title="S50Info | Manual técnico de Sage 50" class="md-header__button md-logo" aria-label="S50Info | Manual técnico de Sage 50" data-md-component="logo">
+    <a href="." title="S50Info | Manual técnico de Sage 50" class="md-header__button md-logo" aria-label="S50Info | Manual técnico de Sage 50" data-md-component="logo">
       
-  <img src="/img/hola.png" alt="logo">
+  <img src="img/hola.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -138,7 +145,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              
+              Manual técnico de S50Info para Sage 50
             
           </span>
         </div>
@@ -256,9 +263,9 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navegación" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="/." title="S50Info | Manual técnico de Sage 50" class="md-nav__button md-logo" aria-label="S50Info | Manual técnico de Sage 50" data-md-component="logo">
+    <a href="." title="S50Info | Manual técnico de Sage 50" class="md-nav__button md-logo" aria-label="S50Info | Manual técnico de Sage 50" data-md-component="logo">
       
-  <img src="/img/hola.png" alt="logo">
+  <img src="img/hola.png" alt="logo">
 
     </a>
     S50Info | Manual técnico de Sage 50
@@ -282,10 +289,37 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="/." class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inicio
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="." class="md-nav__link md-nav__link--active">
         
   
   
@@ -301,6 +335,92 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#elige-la-herramienta-adecuada" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Elige la herramienta adecuada
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ruta-rapida" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ruta rápida
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#encuentra-tu-tarea" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Encuentra tu tarea
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sintaxis-propia-de-s50info" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sintaxis propia de S50Info
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#seguridad-operativa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Seguridad operativa
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#siguiente-paso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Siguiente paso
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -370,7 +490,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/instalacion/" class="md-nav__link">
+      <a href="instalacion/" class="md-nav__link">
         
   
   
@@ -398,7 +518,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/primer-uso/" class="md-nav__link">
+      <a href="primer-uso/" class="md-nav__link">
         
   
   
@@ -491,7 +611,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/comandos/" class="md-nav__link">
+      <a href="comandos/" class="md-nav__link">
         
   
   
@@ -519,7 +639,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/scripts/" class="md-nav__link">
+      <a href="scripts/" class="md-nav__link">
         
   
   
@@ -554,7 +674,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/solucion-problemas/" class="md-nav__link">
+      <a href="solucion-problemas/" class="md-nav__link">
         
   
   
@@ -591,6 +711,82 @@
   
   
   
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#elige-la-herramienta-adecuada" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Elige la herramienta adecuada
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ruta-rapida" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ruta rápida
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#encuentra-tu-tarea" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Encuentra tu tarea
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sintaxis-propia-de-s50info" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sintaxis propia de S50Info
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#seguridad-operativa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Seguridad operativa
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#siguiente-paso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Siguiente paso
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
   
 </nav>
                   </div>
@@ -603,8 +799,153 @@
               
               <article class="md-content__inner md-typeset">
                 
-  <h1>404 - Not found</h1>
+                  
 
+
+  
+  
+
+
+<h1 id="consulta-y-automatiza-sage-50-desde-la-linea-de-comandos">Consulta y automatiza Sage 50 desde la línea de comandos<a class="headerlink" href="#consulta-y-automatiza-sage-50-desde-la-linea-de-comandos" title="Permanent link">&para;</a></h1>
+<p><strong>S50Info es una herramienta técnica para comprobar el entorno, ejecutar consultas de lectura, exportar resultados y automatizar tareas sobre Sage 50.</strong> Este manual lleva desde la instalación hasta la ejecución segura de scripts.</p>
+<h2 id="elige-la-herramienta-adecuada">Elige la herramienta adecuada<a class="headerlink" href="#elige-la-herramienta-adecuada" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Si necesitas...</th>
+<th>Opción recomendada</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Diagnosticar una conexión o consultar datos desde consola</td>
+<td><strong>S50Info</strong></td>
+</tr>
+<tr>
+<td>Exportar datos para una integración o proceso técnico</td>
+<td><strong>S50Info</strong></td>
+</tr>
+<tr>
+<td>Automatizar tareas mediante scripts Python</td>
+<td><strong>S50Info</strong></td>
+</tr>
+<tr>
+<td>Consultar informes, cuadros de mando o plantillas sin usar comandos</td>
+<td><strong>Sage50BI</strong></td>
+</tr>
+</tbody>
+</table>
+<p>S50Info está dirigido a técnicos, administradores, consultores e integradores. Sage50BI es la alternativa visual para usuarios que necesitan análisis e informes sin trabajar con una CLI.</p>
+<h2 id="ruta-rapida">Ruta rápida<a class="headerlink" href="#ruta-rapida" title="Permanent link">&para;</a></h2>
+<p>Los ejemplos usan <code>s50info</code> como comando. Si ejecutas el programa desde su propia carpeta en PowerShell, utiliza <code>./s50info.exe</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="n">s50info</span> <span class="n">info</span>
+<span class="n">s50info</span> <span class="n">sql</span> <span class="s2">&quot;select * from #clientes&quot;</span>
+<span class="n">s50info</span> <span class="n">export</span> <span class="s2">&quot;select codigo, nombre from #clientes&quot;</span> <span class="p">-</span><span class="n">-formato</span> <span class="n">xlsx</span> <span class="p">-</span><span class="n">-output</span> <span class="n">clientes</span>
+</code></pre></div>
+<ol>
+<li><code>info</code> comprueba la conexión y muestra los ejercicios disponibles.</li>
+<li><code>sql</code> valida y ejecuta una consulta de lectura.</li>
+<li><code>export</code> crea el archivo dentro de <code>resultados</code>.</li>
+</ol>
+<p><a class="md-button md-button--primary" href="primer-uso/">Seguir los primeros pasos</a>
+<a class="md-button" href="comandos/">Consultar todos los comandos</a></p>
+<h2 id="encuentra-tu-tarea">Encuentra tu tarea<a class="headerlink" href="#encuentra-tu-tarea" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Objetivo</th>
+<th>Página</th>
+<th>Punto de entrada</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Instalar y preparar la conexión</td>
+<td><a href="instalacion/">Instalación y configuración</a></td>
+<td><code>config.ini</code></td>
+</tr>
+<tr>
+<td>Confirmar que la conexión y la exportación funcionan</td>
+<td><a href="primer-uso/">Primeros pasos</a></td>
+<td><code>s50info info</code></td>
+</tr>
+<tr>
+<td>Consultar tablas de gestión o comunes</td>
+<td><a href="comandos/#consultar-datos-con-sql">Referencia de comandos</a></td>
+<td><code>s50info sql</code></td>
+</tr>
+<tr>
+<td>Exportar a TXT, CSV, JSON, XML o XLSX</td>
+<td><a href="comandos/#exportar-datos-a-un-archivo">Referencia de comandos</a></td>
+<td><code>s50info export</code></td>
+</tr>
+<tr>
+<td>Ejecutar una automatización</td>
+<td><a href="scripts/">Automatización con scripts</a></td>
+<td><code>s50info run</code></td>
+</tr>
+<tr>
+<td>Recuperarse de un error</td>
+<td><a href="solucion-problemas/">Resolver problemas</a></td>
+<td>Síntoma o mensaje</td>
+</tr>
+</tbody>
+</table>
+<h2 id="sintaxis-propia-de-s50info">Sintaxis propia de S50Info<a class="headerlink" href="#sintaxis-propia-de-s50info" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Referencia</th>
+<th>Uso</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>#clientes</code></td>
+<td>Tabla de gestión en el ejercicio seleccionado.</td>
+</tr>
+<tr>
+<td><code>[COMU]gruposemp</code></td>
+<td>Tabla del grupo de comunes activo o indicado.</td>
+</tr>
+<tr>
+<td><code>--sqlyear +</code></td>
+<td>Último ejercicio disponible; es el valor predeterminado.</td>
+</tr>
+<tr>
+<td><code>--sqlyear @</code></td>
+<td>Todos los ejercicios, sin riesgo de expansión de <code>*</code> por el intérprete.</td>
+</tr>
+</tbody>
+</table>
+<p>Los comandos <code>sql</code> y <code>export</code> solo admiten una consulta de lectura que empiece por <code>SELECT</code> o una expresión <code>WITH</code> que termine en <code>SELECT</code>. Rechazan las sentencias de escritura y varias sentencias separadas por punto y coma.</p>
+<h2 id="seguridad-operativa">Seguridad operativa<a class="headerlink" href="#seguridad-operativa" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Prueba cada consulta con <code>sql</code> antes de exportarla o automatizarla.</li>
+<li>Verifica la empresa, el grupo de comunes y el ejercicio resueltos.</li>
+<li>No ejecutes scripts de origen desconocido: <code>run</code> ejecuta el código indicado.</li>
+<li>Revisa los logs antes de usar <code>reset</code>; el vaciado no solicita confirmación.</li>
+</ul>
+<h2 id="siguiente-paso">Siguiente paso<a class="headerlink" href="#siguiente-paso" title="Permanent link">&para;</a></h2>
+<p>Empieza por <a href="instalacion/">instalar y configurar S50Info</a>. Si ya está preparado, completa los <a href="primer-uso/">primeros pasos</a>.</p>
+
+
+
+
+
+
+
+  
+  
+
+
+
+  
+
+
+
+
+                
               </article>
             </div>
           
@@ -622,6 +963,28 @@
       
         <footer class="md-footer">
   
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Pie" >
+        
+        
+          
+          <a href="instalacion/" class="md-footer__link md-footer__link--next" aria-label="Siguiente: Instalación y configuración">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Siguiente
+              </span>
+              <div class="md-ellipsis">
+                Instalación y configuración
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
     
   
   <div class="md-footer-meta md-typeset">
@@ -666,10 +1029,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "/", "features": ["navigation.instant", "navigation.sections", "navigation.top", "navigation.footer", "navigation.indexes", "content.code.copy", "search.highlight", "search.suggest"], "search": "/assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado al portapapeles", "clipboard.copy": "Copiar al portapapeles", "search.result.more.one": "1 m\u00e1s en esta p\u00e1gina", "search.result.more.other": "# m\u00e1s en esta p\u00e1gina", "search.result.none": "No se encontraron documentos", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Teclee para comenzar b\u00fasqueda", "search.result.term.missing": "Falta", "select.version": "Seleccionar versi\u00f3n"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.instant", "navigation.sections", "navigation.top", "navigation.footer", "navigation.indexes", "content.code.copy", "search.highlight", "search.suggest"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado al portapapeles", "clipboard.copy": "Copiar al portapapeles", "search.result.more.one": "1 m\u00e1s en esta p\u00e1gina", "search.result.more.other": "# m\u00e1s en esta p\u00e1gina", "search.result.none": "No se encontraron documentos", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Teclee para comenzar b\u00fasqueda", "search.result.term.missing": "Falta", "select.version": "Seleccionar versi\u00f3n"}, "version": null}</script>
     
     
-      <script src="/assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>

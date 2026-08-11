@@ -6,31 +6,35 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Manual técnico de S50Info para consultar, exportar y automatizar datos de Sage 50 desde la línea de comandos.">
+        <meta name="description" content="Descarga S50Info, prepara la conexión con Sage 50 y verifica la instalación antes de ejecutar consultas o exportaciones.">
       
       
         <meta name="author" content="AlfonsoAutomatiza">
       
       
       
+        <link rel="prev" href="..">
+      
+      
+        <link rel="next" href="../primer-uso/">
       
       
         
       
       
-      <link rel="icon" href="/img/hola.ico">
+      <link rel="icon" href="../img/hola.ico">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>S50Info | Manual técnico de Sage 50</title>
+        <title>Instalar y configurar S50Info en Windows - S50Info | Manual técnico de Sage 50</title>
       
     
     
-      <link rel="stylesheet" href="/assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="/assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -49,9 +53,9 @@
       
     
     
-      <link rel="stylesheet" href="/stylesheets/extra.css">
+      <link rel="stylesheet" href="../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("/",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
   
@@ -71,11 +75,11 @@
   <meta property="og:locale" content="es_ES">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="S50Info | Manual técnico de Sage 50">
-  <meta property="og:title" content="">
-  <meta property="og:description" content="Manual técnico de S50Info para consultar, exportar y automatizar datos de Sage 50 desde la línea de comandos.">
+  <meta property="og:title" content="Instalar y configurar S50Info en Windows">
+  <meta property="og:description" content="Descarga S50Info, prepara la conexión con Sage 50 y verifica la instalación antes de ejecutar consultas o exportaciones.">
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="">
-  <meta name="twitter:description" content="Manual técnico de S50Info para consultar, exportar y automatizar datos de Sage 50 desde la línea de comandos.">
+  <meta name="twitter:title" content="Instalar y configurar S50Info en Windows">
+  <meta name="twitter:description" content="Descarga S50Info, prepara la conexión con Sage 50 y verifica la instalación antes de ejecutar consultas o exportaciones.">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -107,6 +111,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#instalar-y-configurar-s50info-en-windows" class="md-skip">
+          Saltar a contenido
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -119,9 +128,9 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Cabecera">
-    <a href="/." title="S50Info | Manual técnico de Sage 50" class="md-header__button md-logo" aria-label="S50Info | Manual técnico de Sage 50" data-md-component="logo">
+    <a href=".." title="S50Info | Manual técnico de Sage 50" class="md-header__button md-logo" aria-label="S50Info | Manual técnico de Sage 50" data-md-component="logo">
       
-  <img src="/img/hola.png" alt="logo">
+  <img src="../img/hola.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -138,7 +147,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              
+              Instalar y configurar S50Info en Windows
             
           </span>
         </div>
@@ -256,9 +265,9 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navegación" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="/." title="S50Info | Manual técnico de Sage 50" class="md-nav__button md-logo" aria-label="S50Info | Manual técnico de Sage 50" data-md-component="logo">
+    <a href=".." title="S50Info | Manual técnico de Sage 50" class="md-nav__button md-logo" aria-label="S50Info | Manual técnico de Sage 50" data-md-component="logo">
       
-  <img src="/img/hola.png" alt="logo">
+  <img src="../img/hola.png" alt="logo">
 
     </a>
     S50Info | Manual técnico de Sage 50
@@ -285,7 +294,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/." class="md-nav__link">
+      <a href=".." class="md-nav__link">
         
   
   
@@ -309,8 +318,10 @@
       
   
   
+    
   
   
+  
     
     
       
@@ -327,11 +338,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
           <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
@@ -352,7 +363,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             
@@ -367,10 +378,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="/instalacion/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Instalación y configuración
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -386,6 +424,92 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#antes-de-empezar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Antes de empezar
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-descarga-el-instalador" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Descarga el instalador
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-indica-la-ubicacion-de-sage-50" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Indica la ubicación de Sage 50
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-verifica-la-conexion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Verifica la conexión
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Checklist
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#siguiente-paso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Siguiente paso
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -398,7 +522,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/primer-uso/" class="md-nav__link">
+      <a href="../primer-uso/" class="md-nav__link">
         
   
   
@@ -491,7 +615,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/comandos/" class="md-nav__link">
+      <a href="../comandos/" class="md-nav__link">
         
   
   
@@ -519,7 +643,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/scripts/" class="md-nav__link">
+      <a href="../scripts/" class="md-nav__link">
         
   
   
@@ -554,7 +678,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/solucion-problemas/" class="md-nav__link">
+      <a href="../solucion-problemas/" class="md-nav__link">
         
   
   
@@ -591,6 +715,82 @@
   
   
   
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#antes-de-empezar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Antes de empezar
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-descarga-el-instalador" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Descarga el instalador
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-indica-la-ubicacion-de-sage-50" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Indica la ubicación de Sage 50
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-verifica-la-conexion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Verifica la conexión
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Checklist
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#siguiente-paso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Siguiente paso
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
   
 </nav>
                   </div>
@@ -603,8 +803,66 @@
               
               <article class="md-content__inner md-typeset">
                 
-  <h1>404 - Not found</h1>
+                  
 
+
+  
+  
+
+
+<h1 id="instalar-y-configurar-s50info-en-windows">Instalar y configurar S50Info en Windows<a class="headerlink" href="#instalar-y-configurar-s50info-en-windows" title="Permanent link">&para;</a></h1>
+<p>Esta guía prepara un equipo Windows para ejecutar S50Info con la conexión de Sage 50 adecuada.</p>
+<h2 id="antes-de-empezar">Antes de empezar<a class="headerlink" href="#antes-de-empezar" title="Permanent link">&para;</a></h2>
+<p>Necesitas acceso autorizado a la instalación de Sage 50, los datos de conexión de SQL Server y permisos para escribir en la carpeta de trabajo.</p>
+<div class="admonition warning">
+<p class="admonition-title">Protege las credenciales</p>
+<p><code>config.ini</code> puede contener credenciales. No lo publiques, no lo adjuntes a incidencias y limita sus permisos al usuario que ejecutará S50Info.</p>
+</div>
+<h2 id="1-descarga-el-instalador">1. Descarga el instalador<a class="headerlink" href="#1-descarga-el-instalador" title="Permanent link">&para;</a></h2>
+<p><a class="md-button md-button--primary" href="../REPOSITORIO_FICHEROS/Setup_s50info.zip">Descargar el instalador disponible</a></p>
+<p>El ZIP contiene <code>Setup_s50info.exe</code>. Antes de ejecutarlo, verifica que el archivo procede de este manual o de una publicación oficial del repositorio <code>wertyMSD/s50info</code>.</p>
+<p>Si Windows SmartScreen muestra un aviso, no lo ignores automáticamente: confirma el origen del archivo y aplica la política de seguridad de tu organización.</p>
+<h2 id="2-indica-la-ubicacion-de-sage-50">2. Indica la ubicación de Sage 50<a class="headerlink" href="#2-indica-la-ubicacion-de-sage-50" title="Permanent link">&para;</a></h2>
+<p>La configuración inicial solicita la carpeta del terminal de Sage 50. Selecciona la ruta real de tu instalación; <code>C:\Sage50\Sage50Term</code> es solo un ejemplo habitual.</p>
+<p><img alt="Selector de la ubicación del terminal de Sage 50" src="../REPOSITORIO_FICHEROS/configuracion_sage50.png" /></p>
+<p>Utiliza las opciones avanzadas únicamente si el responsable del entorno te ha facilitado servidor, usuario y método de autenticación. No copies credenciales de otros equipos.</p>
+<h2 id="3-verifica-la-conexion">3. Verifica la conexión<a class="headerlink" href="#3-verifica-la-conexion" title="Permanent link">&para;</a></h2>
+<p>Abre PowerShell en la carpeta de S50Info y ejecuta:</p>
+<div class="highlight"><pre><span></span><code><span class="p">./</span><span class="n">s50info</span><span class="p">.</span><span class="n">exe</span> <span class="n">info</span>
+</code></pre></div>
+<p>La salida debe mostrar el grupo de comunes, los ejercicios accesibles y la versión de SQL Server. S50Info oculta la contraseña en esta salida.</p>
+<p>Para comprobar otro grupo de comunes:</p>
+<div class="highlight"><pre><span></span><code><span class="p">./</span><span class="n">s50info</span><span class="p">.</span><span class="n">exe</span> <span class="n">info</span> <span class="p">-</span><span class="n">-grupo-comunes</span> <span class="n">4</span>
+</code></pre></div>
+<p>Sustituye <code>4</code> por el grupo autorizado de tu entorno.</p>
+<h2 id="checklist">Checklist<a class="headerlink" href="#checklist" title="Permanent link">&para;</a></h2>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> El ejecutable procede de una fuente verificada.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> La ubicación de Sage 50 corresponde al equipo actual.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <code>config.ini</code> no está en una carpeta pública o sincronizada sin control.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <code>info</code> muestra el grupo de comunes y los ejercicios esperados.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> El usuario puede crear la carpeta <code>resultados</code>.</li>
+</ul>
+<h2 id="siguiente-paso">Siguiente paso<a class="headerlink" href="#siguiente-paso" title="Permanent link">&para;</a></h2>
+<p>Continúa con los <a href="../primer-uso/">primeros pasos</a> para ejecutar una consulta de lectura y crear la primera exportación.</p>
+
+
+
+
+
+
+
+  
+  
+
+
+
+  
+
+
+
+
+                
               </article>
             </div>
           
@@ -622,6 +880,44 @@
       
         <footer class="md-footer">
   
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Pie" >
+        
+          
+          <a href=".." class="md-footer__link md-footer__link--prev" aria-label="Anterior: Inicio">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Anterior
+              </span>
+              <div class="md-ellipsis">
+                Inicio
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../primer-uso/" class="md-footer__link md-footer__link--next" aria-label="Siguiente: Primeros pasos">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Siguiente
+              </span>
+              <div class="md-ellipsis">
+                Primeros pasos
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
     
   
   <div class="md-footer-meta md-typeset">
@@ -666,10 +962,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "/", "features": ["navigation.instant", "navigation.sections", "navigation.top", "navigation.footer", "navigation.indexes", "content.code.copy", "search.highlight", "search.suggest"], "search": "/assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado al portapapeles", "clipboard.copy": "Copiar al portapapeles", "search.result.more.one": "1 m\u00e1s en esta p\u00e1gina", "search.result.more.other": "# m\u00e1s en esta p\u00e1gina", "search.result.none": "No se encontraron documentos", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Teclee para comenzar b\u00fasqueda", "search.result.term.missing": "Falta", "select.version": "Seleccionar versi\u00f3n"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.sections", "navigation.top", "navigation.footer", "navigation.indexes", "content.code.copy", "search.highlight", "search.suggest"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado al portapapeles", "clipboard.copy": "Copiar al portapapeles", "search.result.more.one": "1 m\u00e1s en esta p\u00e1gina", "search.result.more.other": "# m\u00e1s en esta p\u00e1gina", "search.result.none": "No se encontraron documentos", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Teclee para comenzar b\u00fasqueda", "search.result.term.missing": "Falta", "select.version": "Seleccionar versi\u00f3n"}, "version": null}</script>
     
     
-      <script src="/assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>

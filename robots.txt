@@ -1,7 +1,4 @@
-# robots.txt
-# Indexacion de la documentacion en una sola lengua (es-ES)
-
 User-agent: *
 Allow: /
 
-Sitemap: https://wertymsd.github.io/s50info/sitemap.xml
+# Add an absolute Sitemap line after mkdocs.yml has a verified site_url.

@@ -6,31 +6,35 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Manual técnico de S50Info para consultar, exportar y automatizar datos de Sage 50 desde la línea de comandos.">
+        <meta name="description" content="Comprueba la conexión a Sage 50, ejecuta una consulta de lectura y crea tu primera exportación con S50Info.">
       
       
         <meta name="author" content="AlfonsoAutomatiza">
       
       
       
+        <link rel="prev" href="../instalacion/">
+      
+      
+        <link rel="next" href="../comandos/">
       
       
         
       
       
-      <link rel="icon" href="/img/hola.ico">
+      <link rel="icon" href="../img/hola.ico">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>S50Info | Manual técnico de Sage 50</title>
+        <title>Primeros pasos con S50Info y Sage 50 - S50Info | Manual técnico de Sage 50</title>
       
     
     
-      <link rel="stylesheet" href="/assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="/assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -49,9 +53,9 @@
       
     
     
-      <link rel="stylesheet" href="/stylesheets/extra.css">
+      <link rel="stylesheet" href="../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("/",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
   
@@ -71,11 +75,11 @@
   <meta property="og:locale" content="es_ES">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="S50Info | Manual técnico de Sage 50">
-  <meta property="og:title" content="">
-  <meta property="og:description" content="Manual técnico de S50Info para consultar, exportar y automatizar datos de Sage 50 desde la línea de comandos.">
+  <meta property="og:title" content="Primeros pasos con S50Info y Sage 50">
+  <meta property="og:description" content="Comprueba la conexión a Sage 50, ejecuta una consulta de lectura y crea tu primera exportación con S50Info.">
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="">
-  <meta name="twitter:description" content="Manual técnico de S50Info para consultar, exportar y automatizar datos de Sage 50 desde la línea de comandos.">
+  <meta name="twitter:title" content="Primeros pasos con S50Info y Sage 50">
+  <meta name="twitter:description" content="Comprueba la conexión a Sage 50, ejecuta una consulta de lectura y crea tu primera exportación con S50Info.">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -107,6 +111,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#comprueba-s50info-con-una-consulta-y-una-exportacion" class="md-skip">
+          Saltar a contenido
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -119,9 +128,9 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Cabecera">
-    <a href="/." title="S50Info | Manual técnico de Sage 50" class="md-header__button md-logo" aria-label="S50Info | Manual técnico de Sage 50" data-md-component="logo">
+    <a href=".." title="S50Info | Manual técnico de Sage 50" class="md-header__button md-logo" aria-label="S50Info | Manual técnico de Sage 50" data-md-component="logo">
       
-  <img src="/img/hola.png" alt="logo">
+  <img src="../img/hola.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -138,7 +147,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              
+              Primeros pasos con S50Info y Sage 50
             
           </span>
         </div>
@@ -256,9 +265,9 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navegación" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="/." title="S50Info | Manual técnico de Sage 50" class="md-nav__button md-logo" aria-label="S50Info | Manual técnico de Sage 50" data-md-component="logo">
+    <a href=".." title="S50Info | Manual técnico de Sage 50" class="md-nav__button md-logo" aria-label="S50Info | Manual técnico de Sage 50" data-md-component="logo">
       
-  <img src="/img/hola.png" alt="logo">
+  <img src="../img/hola.png" alt="logo">
 
     </a>
     S50Info | Manual técnico de Sage 50
@@ -285,7 +294,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/." class="md-nav__link">
+      <a href=".." class="md-nav__link">
         
   
   
@@ -309,8 +318,10 @@
       
   
   
+    
   
   
+  
     
     
       
@@ -327,11 +338,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
           <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
@@ -352,7 +363,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             
@@ -370,7 +381,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/instalacion/" class="md-nav__link">
+      <a href="../instalacion/" class="md-nav__link">
         
   
   
@@ -395,10 +406,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="/primer-uso/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Primeros pasos
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -414,6 +452,103 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-comprueba-la-conexion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Comprueba la conexión
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-ejecuta-una-consulta-de-lectura" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Ejecuta una consulta de lectura
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-crea-la-primera-exportacion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Crea la primera exportación
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-selecciona-ejercicios" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Selecciona ejercicios
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-comprueba-una-tabla-de-comunes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Comprueba una tabla de comunes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verificacion-final" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verificación final
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#siguiente-paso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Siguiente paso
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -491,7 +626,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/comandos/" class="md-nav__link">
+      <a href="../comandos/" class="md-nav__link">
         
   
   
@@ -519,7 +654,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/scripts/" class="md-nav__link">
+      <a href="../scripts/" class="md-nav__link">
         
   
   
@@ -554,7 +689,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/solucion-problemas/" class="md-nav__link">
+      <a href="../solucion-problemas/" class="md-nav__link">
         
   
   
@@ -591,6 +726,93 @@
   
   
   
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-comprueba-la-conexion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Comprueba la conexión
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-ejecuta-una-consulta-de-lectura" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Ejecuta una consulta de lectura
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-crea-la-primera-exportacion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Crea la primera exportación
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-selecciona-ejercicios" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Selecciona ejercicios
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-comprueba-una-tabla-de-comunes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Comprueba una tabla de comunes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verificacion-final" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verificación final
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#siguiente-paso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Siguiente paso
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
   
 </nav>
                   </div>
@@ -603,8 +825,92 @@
               
               <article class="md-content__inner md-typeset">
                 
-  <h1>404 - Not found</h1>
+                  
 
+
+  
+  
+
+
+<h1 id="comprueba-s50info-con-una-consulta-y-una-exportacion">Comprueba S50Info con una consulta y una exportación<a class="headerlink" href="#comprueba-s50info-con-una-consulta-y-una-exportacion" title="Permanent link">&para;</a></h1>
+<p>Al terminar esta guía sabrás si el entorno está preparado para usar el resto de comandos.</p>
+<h2 id="1-comprueba-la-conexion">1. Comprueba la conexión<a class="headerlink" href="#1-comprueba-la-conexion" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="n">s50info</span> <span class="n">info</span>
+</code></pre></div>
+<p>Verifica que la salida muestra la configuración activa, el grupo de comunes, los ejercicios disponibles y la versión de SQL Server.</p>
+<h2 id="2-ejecuta-una-consulta-de-lectura">2. Ejecuta una consulta de lectura<a class="headerlink" href="#2-ejecuta-una-consulta-de-lectura" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="n">s50info</span> <span class="n">sql</span> <span class="s2">&quot;select * from #clientes&quot;</span>
+</code></pre></div>
+<p>Comprueba el grupo de comunes utilizado, el ejercicio resuelto, el tiempo de consulta y el SQL final mostrado bajo <code>SQL VALIDO</code>.</p>
+<h2 id="3-crea-la-primera-exportacion">3. Crea la primera exportación<a class="headerlink" href="#3-crea-la-primera-exportacion" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="n">s50info</span> <span class="n">export</span> <span class="s2">&quot;select codigo, nombre from #clientes&quot;</span> <span class="p">-</span><span class="n">-formato</span> <span class="n">xlsx</span> <span class="p">-</span><span class="n">-output</span> <span class="n">clientes_basico</span>
+</code></pre></div>
+<p>El resultado esperado es <code>resultados/clientes_basico.xlsx</code>. Ábrelo y confirma que las columnas y los datos corresponden a la empresa y al ejercicio esperados.</p>
+<p>Si la consulta no devuelve filas, S50Info muestra <code>La lista está vacía</code> y no crea un archivo.</p>
+<h2 id="4-selecciona-ejercicios">4. Selecciona ejercicios<a class="headerlink" href="#4-selecciona-ejercicios" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Necesidad</th>
+<th>Opción</th>
+<th>Ejemplo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Último ejercicio</td>
+<td><code>--sqlyear +</code></td>
+<td><code>s50info sql "select * from #clientes" --sqlyear +</code></td>
+</tr>
+<tr>
+<td>Todos los ejercicios</td>
+<td><code>--sqlyear @</code></td>
+<td><code>s50info sql "select * from #clientes" --sqlyear @</code></td>
+</tr>
+<tr>
+<td>Un ejercicio concreto</td>
+<td><code>--sqlyear 2025JX</code></td>
+<td>Sustituye el valor por uno mostrado por <code>info</code>.</td>
+</tr>
+<tr>
+<td>Varios ejercicios</td>
+<td>Lista separada por comas</td>
+<td><code>--sqlyear 2024JX,2025JX</code></td>
+</tr>
+</tbody>
+</table>
+<p>Usa <code>@</code> para todos los ejercicios. S50Info también acepta <code>*</code>, pero algunos intérpretes pueden expandirlo a nombres de archivos locales.</p>
+<h2 id="5-comprueba-una-tabla-de-comunes">5. Comprueba una tabla de comunes<a class="headerlink" href="#5-comprueba-una-tabla-de-comunes" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="n">s50info</span> <span class="n">sql</span> <span class="s2">&quot;select * from [COMU]gruposemp&quot;</span> <span class="p">-</span><span class="n">-grupo-comunes</span> <span class="n">4</span>
+</code></pre></div>
+<p>Las tablas de gestión se escriben como <code>#tabla</code>; las tablas comunes, como <code>[COMU]tabla</code>.</p>
+<h2 id="verificacion-final">Verificación final<a class="headerlink" href="#verificacion-final" title="Permanent link">&para;</a></h2>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <code>info</code> muestra el grupo y los ejercicios correctos.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <code>sql</code> termina sin error y presenta el SQL resuelto.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <code>export</code> crea un XLSX que se abre y contiene los datos esperados.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> La carpeta <code>resultados</code> es adecuada para el uso previsto.</li>
+</ul>
+<h2 id="siguiente-paso">Siguiente paso<a class="headerlink" href="#siguiente-paso" title="Permanent link">&para;</a></h2>
+<p>Consulta la <a href="../comandos/">referencia de comandos</a> o pasa a <a href="../scripts/">automatización con scripts</a> si necesitas un proceso repetible. Si algo falla, abre <a href="../solucion-problemas/">Resolver problemas</a>.</p>
+
+
+
+
+
+
+
+  
+  
+
+
+
+  
+
+
+
+
+                
               </article>
             </div>
           
@@ -622,6 +928,44 @@
       
         <footer class="md-footer">
   
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Pie" >
+        
+          
+          <a href="../instalacion/" class="md-footer__link md-footer__link--prev" aria-label="Anterior: Instalación y configuración">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Anterior
+              </span>
+              <div class="md-ellipsis">
+                Instalación y configuración
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../comandos/" class="md-footer__link md-footer__link--next" aria-label="Siguiente: Referencia de comandos">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Siguiente
+              </span>
+              <div class="md-ellipsis">
+                Referencia de comandos
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
     
   
   <div class="md-footer-meta md-typeset">
@@ -666,10 +1010,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "/", "features": ["navigation.instant", "navigation.sections", "navigation.top", "navigation.footer", "navigation.indexes", "content.code.copy", "search.highlight", "search.suggest"], "search": "/assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado al portapapeles", "clipboard.copy": "Copiar al portapapeles", "search.result.more.one": "1 m\u00e1s en esta p\u00e1gina", "search.result.more.other": "# m\u00e1s en esta p\u00e1gina", "search.result.none": "No se encontraron documentos", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Teclee para comenzar b\u00fasqueda", "search.result.term.missing": "Falta", "select.version": "Seleccionar versi\u00f3n"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.sections", "navigation.top", "navigation.footer", "navigation.indexes", "content.code.copy", "search.highlight", "search.suggest"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado al portapapeles", "clipboard.copy": "Copiar al portapapeles", "search.result.more.one": "1 m\u00e1s en esta p\u00e1gina", "search.result.more.other": "# m\u00e1s en esta p\u00e1gina", "search.result.none": "No se encontraron documentos", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Teclee para comenzar b\u00fasqueda", "search.result.term.missing": "Falta", "select.version": "Seleccionar versi\u00f3n"}, "version": null}</script>
     
     
-      <script src="/assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>
