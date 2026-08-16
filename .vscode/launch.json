@@ -5,12 +5,21 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python Debugger: main.py",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "main.py",
+            "console": "integratedTerminal"
+        },
+        {
             "name": "Python SQL",
             "type": "debugpy",
             "request": "launch",
             "program": "s50info.py",
             "console": "integratedTerminal",
-            "args": ["-s select * from #clientes"]
+            "args": [
+                "-s select * from #clientes"
+            ]
         },
         {
             "name": "Python exe",
@@ -18,11 +27,12 @@
             "request": "launch",
             "program": "s50info.py",
             "console": "integratedTerminal",
-            "args": ["-e script"]
+            "args": [
+                "run"
+            ]
         },
-    
         {
-            "name": "Python Debugger: Current File",
+            "name": "Python s50info",
             "type": "debugpy",
             "request": "launch",
             "program": "s50info.py",

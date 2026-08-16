@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+         xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+         xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+         IgnorableNamespaces="uap rescap">
+  <Identity Name="InfoMSD.s50info"
+            Publisher="CN=D75F3D07-BF68-4BB3-B36C-5A12A1A03277"
+            Version="2.1.8.0" />
+  <Properties>
+    <DisplayName>s50info</DisplayName>
+    <PublisherDisplayName>InfoMSD</PublisherDisplayName>
+    <Logo>Assets\Square150x150Logo.png</Logo>
+  </Properties>
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.22621.0" />
+  </Dependencies>
+  <Resources>
+    <Resource Language="es-es" />
+  </Resources>
+  <Applications>
+    <Application Id="App" Executable="s50info.exe" EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements DisplayName="s50info"
+                          Description="Cli de consulta a SAGE50"
+                          BackgroundColor="transparent"
+                          Square150x150Logo="Assets\Square150x150Logo.png"
+                          Square44x44Logo="Assets\Square44x44Logo.png" />
+    </Application>
+  </Applications>
+  <Capabilities>
+    <rescap:Capability Name="runFullTrust" />
+  </Capabilities>
+</Package>

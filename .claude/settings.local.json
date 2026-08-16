@@ -1,13 +1,16 @@
 {
   "permissions": {
     "allow": [
-      "Bash(python:*)",
-      "Bash(uv add:*)",
-      "Bash(del:*)",
-      "Bash(dir:*)",
-      "Bash(test:*)"
-    ],
-    "deny": [],
-    "ask": []
+      "mcp__plugin_engram_engram__mem_search",
+      "Bash(powershell -Command \"Get-Date -Format yyyyMMdd-HHmmss\")",
+      "Artifact",
+      "Bash(mkdir -p \"D:/py/@produxion/@SAGE50/s50info/premortem\")",
+      "Bash(mv \"d:/temp/claude/D--py--produxion--SAGE50-s50info/c0855524-b60e-4eda-a567-75b44286a45b/scratchpad/premortem-report-20260730-083843.html\" \"D:/py/@produxion/@SAGE50/s50info/premortem/\")",
+      "Bash(mv \"d:/temp/claude/D--py--produxion--SAGE50-s50info/c0855524-b60e-4eda-a567-75b44286a45b/scratchpad/premortem-transcript-20260730-083843.md\" \"D:/py/@produxion/@SAGE50/s50info/premortem/\")",
+      "Bash(powershell -Command \"Get-ChildItem 'C:\\\\Program Files \\(x86\\)\\\\Windows Kits\\\\10\\\\bin' -Directory | Sort-Object Name -Descending | Select-Object -First 5 Name\")",
+      "Bash(powershell -Command \"\\(Get-ChildItem 'C:\\\\Program Files \\(x86\\)\\\\Windows Kits\\\\10\\\\bin\\\\*\\\\x64\\\\makeappx.exe' -ErrorAction SilentlyContinue\\).FullName\")",
+      "Bash(powershell -Command \"python -c \\\\\"from PIL import Image; print\\(Image.open\\(r'D:\\\\py\\\\@produxion\\\\@SAGE50\\\\s50info\\\\img\\\\hola.png'\\).size\\)\\\\\"\")",
+      "Bash(grep -iE \"readme|md$|\\\\.py$\")"
+    ]
   }
 }

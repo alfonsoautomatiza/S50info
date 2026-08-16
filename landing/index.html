@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>S50Info | CLI técnica para consultar y automatizar SAGE50</title>
+  <meta name="description" content="S50Info es una herramienta de consola gratuita para consultas SQL de lectura, exportaciones y scripts técnicos sobre SAGE50.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!--
+  THESIS: S50Info is a portable intervention console for SAGE50; it refuses the generic SaaS hero of soft cards and vague productivity claims.
+  OWN-WORLD: dark Windows service-bench surfaces, phosphor green command strips, amber warnings, schema-blue data rails, and terminal panes that show real SAGE50 syntax doing work.
+  STORY: the visitor sees a SAGE50 query enter, understands the CLI translates context safely, believes it can export or automate, and moves to copy a real starting command.
+  FIRST VIEWPORT: a split console bay fills the screen: offer and CTA on the left, live command-to-output mechanism on the right, with command rails running underneath.
+  FORM: candidate 7 of the grounded list, a support-engineer control bay and runbook console; seed key a0fc7fcf.
+  FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
+  -->
+  <header class="site-header" aria-label="Navegación principal">
+    <a class="brand" href="#top" aria-label="S50Info inicio">
+      <span class="brand-mark" aria-hidden="true">S50</span>
+      <span>S50Info</span>
+    </a>
+    <nav class="nav-links" aria-label="Secciones">
+      <a href="#mecanismo">Mecanismo</a>
+      <a href="#comandos">Comandos</a>
+      <a href="#automatizacion">Automatización</a>
+      <a href="#limites">Límites</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="system-line">Windows CLI · SAGE50 · SQL Server</p>
+        <h1 id="hero-title">Consulta, exporta y automatiza SAGE50 desde una sola consola.</h1>
+        <p class="hero-lead">S50Info es una herramienta gratuita para equipos técnicos que necesitan revisar datos, generar salidas y ejecutar mantenimientos sin abrir SSMS para cada comprobación.</p>
+        <div class="hero-actions" aria-label="Acciones principales">
+          <a class="button primary" href="#arranque">Ver arranque rápido</a>
+          <a class="button secondary" href="#mecanismo">Entender el flujo</a>
+        </div>
+      </div>
+
+      <div class="console-bay" aria-label="Demostración del mecanismo de S50Info">
+        <div class="console-topbar">
+          <span>session: s50info.exe</span>
+          <span class="status-ok">read-only</span>
+        </div>
+        <div class="console-grid">
+          <div class="terminal-panel input-panel">
+            <span class="panel-label">Entrada</span>
+            <pre><code>s50info export "SELECT * FROM #clientes" &#45;&#45;sqlyear <span id="year-token">@</span> &#45;&#45;formato <span id="format-token">xlsx</span> &#45;&#45;output clientes</code></pre>
+          </div>
+          <div class="flow-rail" aria-hidden="true">
+            <span>parse</span>
+            <span>contexto</span>
+            <span>export</span>
+          </div>
+          <div class="terminal-panel output-panel">
+            <span class="panel-label">Salida</span>
+            <div class="output-lines" id="output-lines">
+              <p><strong>#clientes</strong> se resuelve contra tablas de gestión.</p>
+              <p><strong>&#45;&#45;sqlyear @</strong> une los ejercicios disponibles.</p>
+              <p><strong>clientes.xlsx</strong> queda listo para revisión o entrega.</p>
+            </div>
+          </div>
+        </div>
+        <div class="console-controls" aria-label="Variar ejemplo de exportación">
+          <button class="chip is-active" type="button" data-year="@">Todos los años</button>
+          <button class="chip" type="button" data-year="2025JX">2025JX</button>
+          <button class="chip" type="button" data-format="csv">CSV</button>
+          <button class="chip is-active" type="button" data-format="xlsx">XLSX</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="signal-strip" aria-label="Capacidades principales">
+      <div>
+        <span>SQL seguro</span>
+        <strong>SELECT/WITH</strong>
+      </div>
+      <div>
+        <span>Sintaxis SAGE50</span>
+        <strong>#clientes · [COMU]</strong>
+      </div>
+      <div>
+        <span>Formatos</span>
+        <strong>TXT · CSV · JSON · XML · XLSX</strong>
+      </div>
+      <div>
+        <span>Distribución</span>
+        <strong>Windows standalone</strong>
+      </div>
+    </section>
+
+    <section class="mechanism" id="mecanismo" aria-labelledby="mechanism-title">
+      <div class="section-heading">
+        <h2 id="mechanism-title">El valor está en el contexto SAGE50, no solo en ejecutar SQL.</h2>
+        <p>S50Info traduce la forma en que un técnico piensa una consulta SAGE50 a las bases reales, años fiscales y comunes configurados.</p>
+      </div>
+      <div class="translation-board">
+        <div class="query-card">
+          <span class="panel-label">Consulta que escribe el técnico</span>
+          <code>SELECT CODIGO, MAX(NOMBRE) FROM #clientes</code>
+        </div>
+        <div class="translation-arrow" aria-hidden="true">→</div>
+        <div class="query-card resolved">
+          <span class="panel-label">Contexto que resuelve S50Info</span>
+          <ul>
+            <li>`#clientes` apunta a tablas de gestión.</li>
+            <li>`&#45;&#45;sqlyear @` recorre ejercicios disponibles.</li>
+            <li>`&#45;&#45;groupby CODIGO` consolida registros repetidos.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="command-deck" id="comandos" aria-labelledby="commands-title">
+      <div class="section-heading narrow">
+        <h2 id="commands-title">Cinco comandos para el trabajo técnico diario.</h2>
+        <p>Todo queda en una CLI auto-documentada, apta para soporte, integraciones, PowerShell, `.bat` y tareas programadas.</p>
+      </div>
+      <div class="command-list">
+        <article class="command-row">
+          <code>s50info info</code>
+          <p>Muestra servidor, comunes, años disponibles y estado de conexión.</p>
+        </article>
+        <article class="command-row">
+          <code>s50info sql "SELECT * FROM #clientes"</code>
+          <p>Ejecuta SQL de lectura y muestra el resultado en consola.</p>
+        </article>
+        <article class="command-row">
+          <code>s50info export "SELECT * FROM #articulos" &#45;&#45;formato xlsx</code>
+          <p>Genera archivos TXT, CSV, JSON, XML o XLSX; también puede comprimir con `&#45;&#45;zip`.</p>
+        </article>
+        <article class="command-row">
+          <code>s50info run script\mi_script.py</code>
+          <p>Ejecuta Python con `proceso`, `query_to_dict` y helpers SAGE50 ya preparados.</p>
+        </article>
+        <article class="command-row warning-row">
+          <code>s50info reset</code>
+          <p>Trunca logs técnicos de SAGE50 cuando el mantenimiento lo requiere.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="automation" id="automatizacion" aria-labelledby="automation-title">
+      <div class="runbook">
+        <span class="panel-label">Runbook de exportación programada</span>
+        <pre><code>@echo off
+s50info export "SELECT * FROM #articulos" &#45;&#45;formato csv &#45;&#45;output articulos_diarios
+if errorlevel 1 exit /b 1</code></pre>
+        <button class="button copy" type="button" data-copy="s50info export &quot;SELECT * FROM #articulos&quot; &#45;&#45;formato csv &#45;&#45;output articulos_diarios">Copiar comando base</button>
+        <p class="copy-status" id="copy-status" role="status" aria-live="polite"></p>
+      </div>
+      <div class="automation-copy">
+        <h2 id="automation-title">Preparado para automatizar, no para impresionar con pantallas.</h2>
+        <p>La herramienta se distribuye como ejecutable Windows autónomo con PyInstaller. No exige instalar Python en el puesto final: se configura `config.ini`, se verifica con `s50info.exe info` y se integra en los flujos técnicos existentes.</p>
+        <div class="release-note">
+          <strong>Actualizaciones y releases:</strong>
+          <span>el proyecto incluye flujo de ZIP, manifest firmado, GitHub Releases y publicación de documentación para distribuir versiones.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="boundaries" id="limites" aria-labelledby="boundaries-title">
+      <div class="section-heading narrow">
+        <h2 id="boundaries-title">Lo que hace y lo que no pretende ser.</h2>
+        <p>La promesa es técnica y concreta: operar mejor SAGE50 desde consola, sin vender una suite que el producto no es.</p>
+      </div>
+      <div class="boundary-grid">
+        <div class="boundary-panel positive">
+          <h3>Sí encaja cuando necesitás</h3>
+          <ul>
+            <li>consultas rápidas de soporte o diagnóstico;</li>
+            <li>exportaciones puntuales para revisión o integración;</li>
+            <li>scripts Python con contexto SAGE50 inicializado;</li>
+            <li>mantenimientos técnicos repetibles.</li>
+          </ul>
+        </div>
+        <div class="boundary-panel negative">
+          <h3>No es</h3>
+          <ul>
+            <li>un reemplazo completo de SSMS;</li>
+            <li>un ETL o migrador de esquemas;</li>
+            <li>una interfaz web o API REST;</li>
+            <li>una solución BI visual para usuario final.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="quickstart" id="arranque" aria-labelledby="quickstart-title">
+      <div>
+        <h2 id="quickstart-title">Arranque rápido</h2>
+        <p>Descargá el ZIP de release, extraé en `C:\S50Info\`, completá `config.ini` con servidor, credenciales, driver y comunes, y verificá la conexión.</p>
+      </div>
+      <pre><code>s50info.exe info
+s50info sql "SELECT * FROM #clientes" &#45;&#45;sqlyear @
+s50info export "SELECT * FROM #clientes" &#45;&#45;formato xlsx &#45;&#45;output clientes</code></pre>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>S50Info es una herramienta técnica gratuita para SAGE50. Para informes visuales y plantillas de negocio, la documentación recomienda Sage50BI.</p>
+    <a href="#top">Volver arriba</a>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

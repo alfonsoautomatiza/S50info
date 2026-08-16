@@ -1,0 +1,63 @@
+import importlib.util
+from pathlib import Path
+from xml.etree import ElementTree
+
+import pytest
+from PIL import Image, ImageChops
+
+
+ROOT = Path(__file__).resolve().parents[1]
+BUILDER_PATH = ROOT / "msix" / "build_msix.py"
+
+
+def load_builder():
+    spec = importlib.util.spec_from_file_location("build_msix", BUILDER_PATH)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_branded_assets_are_generated_and_referenced_by_manifest(tmp_path):
+    builder = load_builder()
+    source = ROOT / "img" / "store" / "box_1x1_2160.png"
+
+    builder.write_assets(tmp_path, source)
+    builder.write_manifest(
+        tmp_path,
+        package_name="InfoMSD.s50info",
+        publisher="CN=publisher",
+        version="1.2.3.0",
+        display_name="s50info",
+        publisher_display_name="InfoMSD",
+    )
+
+    with Image.open(source) as original:
+        source_thumbnail = original.convert("RGBA").resize((44, 44), Image.Resampling.LANCZOS)
+    for filename, expected_size in (
+        ("Square44x44Logo.png", (44, 44)),
+        ("Square150x150Logo.png", (150, 150)),
+    ):
+        with Image.open(tmp_path / "Assets" / filename) as asset:
+            assert asset.size == expected_size
+            assert len(asset.convert("RGB").getcolors(maxcolors=expected_size[0] * expected_size[1])) > 1
+
+    with Image.open(tmp_path / "Assets" / "Square44x44Logo.png") as small_asset:
+        assert ImageChops.difference(small_asset.convert("RGBA"), source_thumbnail).getbbox() is None
+
+    manifest = ElementTree.parse(tmp_path / "AppxManifest.xml")
+    namespace = {
+        "appx": "http://schemas.microsoft.com/appx/manifest/foundation/windows10",
+        "uap": "http://schemas.microsoft.com/appx/manifest/uap/windows10",
+    }
+    properties_logo = manifest.findtext("appx:Properties/appx:Logo", namespaces=namespace)
+    visual = manifest.find("appx:Applications/appx:Application/uap:VisualElements", namespace)
+    assert properties_logo == r"Assets\Square150x150Logo.png"
+    assert visual.attrib["Square44x44Logo"] == r"Assets\Square44x44Logo.png"
+    assert visual.attrib["Square150x150Logo"] == r"Assets\Square150x150Logo.png"
+
+
+def test_asset_generation_fails_when_branded_source_is_missing(tmp_path):
+    builder = load_builder()
+
+    with pytest.raises(SystemExit, match="Branded Store asset source not found"):
+        builder.write_assets(tmp_path, tmp_path / "missing.png")

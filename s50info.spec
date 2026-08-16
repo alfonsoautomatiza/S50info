@@ -1,48 +1,157 @@
 # -*- mode: python ; coding: utf-8 -*-
 import os
+from pathlib import Path
+from importlib.metadata import PackageNotFoundError
+
 from PyInstaller.utils.hooks import collect_data_files, collect_submodules, copy_metadata
 
-codigo_modules = []
-apisage50_modules = []
-# Recopilar los archivos .pyd compilados de las carpetas exe/codigo y exe/apiSage50
-binaries = []
 
-
-# Agregar archivos .pyd de apiSage50, incluyendo subdirectorios
-apisage50_pyd_dir = os.path.join(SPECPATH, "apiSage50")
-if os.path.exists(apisage50_pyd_dir):
-    for root, _, files in os.walk(apisage50_pyd_dir):
-        for file in files:
-            if file.endswith(".pyd"):
-                src = os.path.join(root, file)
-                # Determinar la ruta de destino relativa al directorio raíz de PyInstaller (SPECPATH)
-                # Esto preservará la estructura de directorios dentro del paquete apiSage50
-                dest_folder = os.path.relpath(root, SPECPATH)
-                binaries.append((src, dest_folder))
-
-# Asegura que PyInstaller analice los módulos usando la raíz del proyecto
-project_root = os.path.abspath(os.path.join(SPECPATH, os.pardir))
-external_paths = [
-    os.path.abspath(os.path.join(project_root, "..", "@api", "mislibrerias")),
-    os.path.abspath(os.path.join(project_root, "..", "@api", "api_sage50")),
-]
-external_paths = [p for p in external_paths if os.path.isdir(p)]
+spec_root = Path(SPECPATH).resolve()
+project_root = spec_root.parent
 block_cipher = None
+
+
+def existing_paths(*paths):
+    return [str(path) for path in paths if path.is_dir()]
+
+
+def collect_local_binaries(base_dir):
+    binaries = []
+    for pattern in ("*.pyd", "*.dll"):
+        for src in base_dir.rglob(pattern):
+            dest = "." if src.parent == base_dir else os.path.relpath(src.parent, base_dir)
+            binaries.append((str(src), dest))
+    return binaries
+
+
+def collect_local_datas(base_dir, project_dir):
+    datas = []
+
+    # config.ini / agent.ini NO se empaquetan: se crean en runtime cuando la
+    # app detecta un SAGE50 instalado. Empaquetarlos metia datos de desarrollo
+    # en el instalador y rompia el primer arranque en MSIX (carpeta read-only).
+    script_dir = project_dir / "script"
+    if script_dir.is_dir():
+        for src in script_dir.rglob("*.py"):
+            dest = os.path.relpath(src.parent, project_dir)
+            datas.append((str(src), dest))
+
+    return datas
+
+
+def safe_copy_metadata(package_name):
+    try:
+        return copy_metadata(package_name)
+    except PackageNotFoundError:
+        return []
+
+
+def safe_collect_data_files(package_name, include_py_files=False):
+    try:
+        return collect_data_files(package_name, include_py_files=include_py_files)
+    except Exception:
+        return []
+
+
+def safe_collect_submodules(package_name, **kwargs):
+    try:
+        return collect_submodules(package_name, **kwargs)
+    except Exception:
+        return []
+
+
+external_paths = existing_paths(
+    project_root.parent / "@api" / "mislibrerias",
+    project_root.parent / "@api" / "api_sage50",
+)
+
+binaries = collect_local_binaries(spec_root)
+
+datas = collect_local_datas(spec_root, project_root)
+for package in ("openpyxl", "markdown", "pysage50e", "PySimpleGUI", "nacl", "polars"):
+    datas += safe_collect_data_files(package, include_py_files=False)
+
+hiddenimports = [
+    "_cffi_backend",
+    "_elementpath",
+    "cffi",
+    "cffi.api",
+    "cffi.vengine_cpy",
+    "configparser",
+    "cryptography.fernet",
+    "cryptography.hazmat.bindings._rust",
+    "dotenv",
+    "email.mime.application",
+    "email.mime.multipart",
+    "email.mime.text",
+    "http.server",
+    "html",
+    "html.entities",
+    "html.parser",
+    "httpx",
+    "json",
+    "nacl",
+    "nacl.bindings",
+    "nacl.encoding",
+    "nacl.exceptions",
+    "nacl.signing",
+    "libwertyconfig",
+    "libwertylog",
+    "libwertymail",
+    "logging.handlers",
+    "lxml._elementpath",
+    "lxml.etree",
+    "markdown",
+    "openpyxl",
+    "polars",
+    "psutil",
+    "pyodbc",
+    "PySimpleGUI",
+    "PySimpleGUI.PySimpleGUI",
+    "rich",
+    "s50exportador_resultados",
+    "s50proceso",
+    "s50script",
+    "s50setup",
+    "sqlparse",
+    "typer",
+    "uuid",
+    "webbrowser",
+    "xml.etree.ElementTree",
+    "xml.etree.ElementPath",
+    "pynacl",
+]
+
+for package in ("pysage50e", "rich", "typer", "openpyxl", "lxml", "PySimpleGUI", "nacl"):
+    hiddenimports += safe_collect_submodules(package)
+
+hiddenimports += safe_collect_submodules(
+    "polars",
+    filter=lambda name: not name.startswith("polars.testing"),
+)
+
+for package in (
+    "markdown",
+    "python-docx",
+    "pysage50e",
+    "rich",
+    "typer",
+    "PyNaCl",
+    "pynacl",
+    "PySimpleGUI",
+    "pysimplegui-4-foss",
+    "polars",
+):
+    datas += safe_copy_metadata(package)
 
 
 # Configuración del análisis del script principal
 a = Analysis(
     ['s50info.py'],
-    pathex=[project_root] + external_paths,
+    pathex=[str(project_root)] + external_paths,
     binaries=binaries,
-    datas=[],
-    hiddenimports=['json', 'configparser',"exportador_resultados","pandas","openpyxl",
-                   'xml.etree.ElementTree',"sqlparse","typer",
-                   'webbrowser', 'pyodbc', 'libwertyconfig', 'libwertylog', 'libwertymail',
-                   'cryptography.fernet', 'httpx', 'psutil',"cryptography.hazmat.bindings._rust",
-                   'clr', 'http.server', 'requests_oauthlib', 'email.mime', 'email.mime.text',
-                   'email.mime.multipart', 'email.mime.application', 'markdown',
-                   'uuid', 'logging.handlers', 'PySimpleGUI', 'libsage50'] + apisage50_modules,
+    datas=datas,
+    hiddenimports=sorted(set(hiddenimports)),
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
@@ -54,30 +163,21 @@ a = Analysis(
 )
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
-# Genera el ejecutable como carpeta (no en modo onefile)
+# Genera un unico ejecutable onefile.
 exe = EXE(
     pyz,
     a.scripts,
-    [],  # Sin binarios aquí, se guardan por separado
-    exclude_binaries=True,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
+    [],
+    exclude_binaries=False,
     name='s50info',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
-    upx=True,
+    upx=False,
     console=True,
     icon='hola.ico',
     version='version.txt',
-)
-
-# Recopila archivos necesarios en una carpeta COLLECT
-coll = COLLECT(
-    exe,
-    a.binaries,
-    a.zipfiles,
-    a.datas,
-    strip=False,
-    upx=True,
-    upx_exclude=[],
-    name='s50info'
 )

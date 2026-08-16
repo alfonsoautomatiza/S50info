@@ -1,0 +1,174 @@
+<title>Premortem — S50Info como puente hacia Sage50BI</title>
+<style>
+:root{color-scheme:dark light;}
+body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;background:#0a0e1a;color:#e6e9f0;max-width:980px;margin:0 auto;padding:2rem 1.25rem 4rem;line-height:1.55;}
+@media (prefers-color-scheme: light){body{background:#f4f5f8;color:#1a1d29;}}
+:root[data-theme="light"] body{background:#f4f5f8;color:#1a1d29;}
+h1{font-size:1.7rem;margin-bottom:.25rem;}
+.subtitle{color:#8b93a8;margin-bottom:2rem;font-size:.95rem;}
+.frame{background:#151a2b;border:1px solid #2a3150;border-radius:10px;padding:1rem 1.25rem;margin-bottom:2rem;font-size:.95rem;color:#c3c9dc;}
+:root[data-theme="light"] .frame, @media (prefers-color-scheme:light){.frame{background:#fff;border-color:#dfe2ec;color:#3a3f52;}}
+h2{font-size:1.2rem;margin-top:2.5rem;border-bottom:1px solid #2a3150;padding-bottom:.4rem;}
+:root[data-theme="light"] h2{border-color:#dfe2ec;}
+.synth-grid{display:grid;gap:1rem;margin-top:1rem;}
+.synth-card{background:#151a2b;border-left:4px solid #5b8def;border-radius:8px;padding:1rem 1.25rem;}
+:root[data-theme="light"] .synth-card, @media (prefers-color-scheme:light){.synth-card{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.08);}}
+.synth-card h3{margin:0 0 .5rem;font-size:.95rem;text-transform:uppercase;letter-spacing:.03em;color:#8fb2ff;}
+.synth-card.danger{border-color:#e5556b;}
+.synth-card.danger h3{color:#ff8a9a;}
+.synth-card.assumption{border-color:#f0a94e;}
+.synth-card.assumption h3{color:#ffc978;}
+.synth-card.plan{border-color:#42c97a;}
+.synth-card.plan h3{color:#6fe0a0;}
+.checklist{list-style:none;padding:0;margin:0;}
+.checklist li{padding:.4rem 0 .4rem 1.6rem;position:relative;border-bottom:1px dashed #2a3150;}
+:root[data-theme="light"] .checklist li{border-color:#e2e5f0;}
+.checklist li::before{content:"☐";position:absolute;left:0;color:#5b8def;}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1rem;margin-top:1rem;}
+.card{background:#151a2b;border-radius:10px;padding:1.1rem 1.25rem;border-top:4px solid var(--accent);}
+:root[data-theme="light"] .card, @media (prefers-color-scheme:light){.card{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.08);}}
+.card h3{margin:0 0 .5rem;font-size:.98rem;color:var(--accent);}
+.card .story{font-size:.88rem;color:#c3c9dc;margin-bottom:.7rem;}
+:root[data-theme="light"] .card .story{color:#4a4f63;}
+.card .label{font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:#8b93a8;margin-top:.6rem;}
+.card .assump{font-size:.85rem;font-style:italic;color:#f0a94e;}
+.card ul{margin:.3rem 0 0;padding-left:1.1rem;font-size:.82rem;color:#8fb2ff;}
+.sev{display:inline-block;font-size:.68rem;padding:.15rem .5rem;border-radius:99px;margin-left:.4rem;vertical-align:middle;}
+.sev.high{background:#3a1420;color:#ff8a9a;}
+.sev.med{background:#3a2c14;color:#ffc978;}
+footer{margin-top:3rem;padding-top:1rem;border-top:1px solid #2a3150;color:#666f87;font-size:.8rem;}
+:root[data-theme="light"] footer{border-color:#dfe2ec;}
+</style>
+
+<h1>Premortem: S50Info como puente hacia Sage50BI</h1>
+<div class="subtitle">6 meses en el futuro · la estrategia ha fallado · 9 agentes de análisis</div>
+
+<div class="frame">
+<strong>El plan sometido a premortem:</strong> donar S50Info (CLI técnica gratuita para Sage50) a la comunidad de administradores, consultores y desarrolladores, para que sirva como llamada de atención y puente de cross-promotion hacia Sage50BI (producto con dashboards, informes y plantillas orientado a usuarios finales de negocio). El README ya posiciona explícitamente a Sage50BI como la opción recomendada para quien busca "más".
+</div>
+
+<h2>Síntesis</h2>
+<div class="synth-grid">
+
+<div class="synth-card danger">
+<h3>Fallo más probable</h3>
+Desajuste de público: quien usa S50Info es un técnico/consultor que resuelve sus propios problemas por consola — precisamente el perfil que <em>no</em> necesita un dashboard "amigable" y que rara vez es quien decide comprar BI. Cuantas más funciones gana la CLI, más autosuficiente se vuelve ese usuario, no menos. El README, único vehículo del mensaje, solo se lee una vez y antes de usar la herramienta — nunca durante el uso recurrente.
+</div>
+
+<div class="synth-card danger">
+<h3>Fallo más peligroso</h3>
+El consultor técnico que usa S50Info suele ser el mismo que asesora al cliente final sobre qué comprar. Si percibe a Sage50BI como competencia a sus propios servicios de informes a medida, puede desaconsejarlo activamente en conversaciones 1:1 invisibles para el equipo de ventas — un daño que se acumula sin ser detectado hasta que el ciclo de venta ya se alargó y la percepción "ALCA TIC = gratis/gama baja" ya se instaló en la comunidad.
+</div>
+
+<div class="synth-card assumption">
+<h3>Supuesto oculto</h3>
+Se asume que "usar herramientas de Sage50" es un proxy suficiente para "ser comprador potencial de Sage50BI" — que compartir la plataforma (Sage50) implica compartir el rol de decisión (técnico ejecutor vs. decisor de negocio). Es el supuesto que sostiene todo el plan y el que nadie cuestionó.
+</div>
+
+<div class="synth-card plan">
+<h3>Plan revisado</h3>
+<ul style="margin:.3rem 0 0 1.1rem;font-size:.9rem;color:#c3c9dc;">
+<li>No tratar el README como canal de conversión: instrumentar un punto de contacto activo (ej. un mensaje ocasional y no intrusivo en la CLI tras N usos, con opt-in) en vez de confiar en texto pasivo.</li>
+<li>Medir desde el día 1 quién usa S50Info (rol, no solo volumen de descargas) antes de proyectar ninguna conversión — sin esto, el experimento es invisible y no se puede corregir a tiempo.</li>
+<li>Diseñar el enganche a Sage50BI hacia el <em>cliente final</em> del consultor (el dueño de la PYME), no hacia el propio consultor — evitando que el canal de distribución tenga incentivo económico para bloquear el mensaje.</li>
+<li>Separar explícitamente la narrativa de precio: comunicar por qué Sage50BI es una categoría de producto distinta (gestionado, visual, para no-técnicos) y no "la versión de pago de lo mismo", para no contaminar la percepción de valor.</li>
+</ul>
+</div>
+</div>
+
+<h2>Lista de verificación pre-lanzamiento</h2>
+<ul class="checklist">
+<li>Definir y medir el TAM real (nº de administradores/consultores Sage50 alcanzables) antes de proyectar cualquier tasa de conversión — sin esto no se sabe si el canal puede "mover la aguja" aunque todo funcione perfecto.</li>
+<li>Instrumentar algún mecanismo mínimo de identificación de uso (telemetría opt-in, o al menos un CTA con UTM medible) — sin datos de quién usa la herramienta, el experimento entero es invisible.</li>
+<li>Validar con 5-10 usuarios reales de S50Info si entienden la relación con Sage50BI y si alguno encaja en el perfil comprador, antes de escalar la distribución.</li>
+<li>Revisar la licencia/distribución para anticipar forks y redistribución sin atribución (canal de descubrimiento ≠ canal de consumo en software técnico).</li>
+<li>Diseñar el mensaje de Sage50BI dirigido explícitamente al cliente final del consultor, no al consultor mismo, para evitar el conflicto de incentivos.</li>
+</ul>
+
+<h2>Los 9 escenarios de fallo</h2>
+<div class="cards">
+
+<div class="card" style="--accent:#5b8def;">
+<h3>1. Público equivocado en el puente <span class="sev high">Alta prob.</span></h3>
+<div class="story">S50Info tracciona entre técnicos que la usan para tareas puntuales (backups, exports, cronjobs) y cierran la terminal. Nunca aparece un momento natural de "esto podría ser un dashboard". Las promociones internas de Sage50BI reciben clics por debajo del 0.5%; los leads que llegan son técnicos pidiendo más flags CLI, no gerentes pidiendo demos.</div>
+<div class="label">Supuesto</div>
+<div class="assump">Compartir plataforma (Sage50) implica compartir rol de decisión de compra.</div>
+<div class="label">Señales tempranas</div>
+<ul><li>CTR &lt;0.5% en promociones internas desde el mes 1</li><li>Telemetría muestra 100% rol técnico/IT, cero cargos de gerencia</li></ul>
+</div>
+
+<div class="card" style="--accent:#5b8def;">
+<h3>2. El CLI entrena competencia interna (DIY) <span class="sev high">Alta prob.</span></h3>
+<div class="story">Cuanta más funcionalidad gana S50Info (más formatos, más flags, modo `--exec`), más autosuficientes se vuelven los usuarios. Objeción recurrente en ventas: "ya lo tengo montado con S50Info y Excel/Power BI, gracias". La comunidad se enorgullece de construir sus propias soluciones, no de buscar dashboards gestionados.</div>
+<div class="label">Supuesto</div>
+<div class="assump">Dar más poder técnico acerca al usuario al producto gestionado, en vez de alejarlo.</div>
+<div class="label">Señales tempranas</div>
+<ul><li>Conversión CLI→demo cercana a 0% pese a instalaciones crecientes</li><li>PRs/issues pidiendo más flags, no pidiendo "verlo en un dashboard"</li></ul>
+</div>
+
+<div class="card" style="--accent:#8fb2ff;">
+<h3>3. El README es pasivo y de un solo uso <span class="sev med">Media prob.</span></h3>
+<div class="story">El README se lee una vez, en GitHub, durante la evaluación inicial — nunca vuelve a abrirse tras la primera configuración. No hay ningún punto de contacto recurrente dentro de la CLI (ni un `--about`, ni una nota ocasional). El mensaje queda atrapado en el momento en que el usuario menos piensa en "qué otro producto necesito".</div>
+<div class="label">Supuesto</div>
+<div class="assump">Documentar equivale a comunicar, aunque solo lo lea quien ya busca ese dato exacto.</div>
+<div class="label">Señales tempranas</div>
+<ul><li>Ratio de clics README→landing &lt;2-3% de instalaciones activas</li><li>Cero menciones espontáneas a Sage50BI en issues/comunidad</li></ul>
+</div>
+
+<div class="card" style="--accent:#8fb2ff;">
+<h3>4. Gratis no genera atención por sí solo <span class="sev med">Media prob.</span></h3>
+<div class="story">Sin campaña de distribución, SEO o comunidad activa, el repo queda invisible: 3 estrellas (todas de empleados), cero forks, cero backlinks. Un experimento de postear una vez en un foro genera un pico de 40 descargas en 3 días y vuelve a cero — confirma que la demanda existe pero requiere empuje continuo, no un evento puntual.</div>
+<div class="label">Supuesto</div>
+<div class="assump">Un producto gratuito y útil genera su propio tráfico sin inversión activa en distribución.</div>
+<div class="label">Señales tempranas</div>
+<ul><li>Cero tráfico de referidos externo en la semana 2</li><li>Ausencia total de menciones orgánicas en el mes 1</li></ul>
+</div>
+
+<div class="card" style="--accent:#ffc978;">
+<h3>5. El nicho es demasiado pequeño <span class="sev med">Media prob.</span></h3>
+<div class="story">De 400 instalaciones, quizá 40 son "cualificadas" para decidir compra. Con una conversión optimizada del 8% (mejor que benchmark SaaS B2B), salen 3 demos y 1 cierre. Nunca se calculó el TAM absoluto antes de lanzar: el techo real del canal, incluso con conversión perfecta, son decenas de clientes, no los cientos necesarios para mover el negocio.</div>
+<div class="label">Supuesto</div>
+<div class="assump">Optimizar la tasa de conversión importa más que el tamaño absoluto de la población que entra al embudo.</div>
+<div class="label">Señales tempranas</div>
+<ul><li>Nunca se calculó el TAM alcanzable antes de lanzar</li><li>Métricas de mes 1-2 nunca cruzadas contra el tamaño de mercado real</li></ul>
+</div>
+
+<div class="card" style="--accent:#e5556b;">
+<h3>6. Forks y redistribución rompen la atribución <span class="sev high">Alta prob.</span></h3>
+<div class="story">A las 3 semanas, un integrador hace fork, quita el nombre y lo empaqueta bajo su propia marca. A los 2 meses, 3 paquetes en PyPI y un mirror interno redistribuyen S50Info sin enlace al original. Usuarios instalan vía mirrors internos y nunca ven el README ni el CTA hacia Sage50BI: canal de descubrimiento y canal de consumo se separan.</div>
+<div class="label">Supuesto</div>
+<div class="assump">El canal de descubrimiento (repo oficial→README→CTA) será el canal real de consumo.</div>
+<div class="label">Señales tempranas</div>
+<ul><li>Menciones en foros de terceros crecen más rápido que visitas al repo oficial</li><li>Cero clics al CTA pese a descargas crecientes (uso fuera del canal instrumentado)</li></ul>
+</div>
+
+<div class="card" style="--accent:#e5556b;">
+<h3>7. El consultor desaconseja Sage50BI por conflicto de interés <span class="sev high">Peligro alto</span></h3>
+<div class="story">Un consultor que factura informes a medida (60-90€/h) reconoce que Sage50BI automatiza lo que él vende. En llamadas 1:1 con clientes responde "mejor seguimos con lo que tenemos, da problemas con las actualizaciones" — fricción invisible para el equipo de ventas. El patrón se replica sin coordinación entre consultores; las demos solicitadas caen un 70% frente a la proyección.</div>
+<div class="label">Supuesto</div>
+<div class="assump">El canal de distribución (el técnico) y el beneficiario (Sage50BI) tienen incentivos alineados.</div>
+<div class="label">Señales tempranas</div>
+<ul><li>Conversión de leads vía consultor muy inferior a leads directos, no detectada por falta de segmentación</li><li>Cero consultores se inscriben como partner/revendedor pese a invitación</li></ul>
+</div>
+
+<div class="card" style="--accent:#f0a94e;">
+<h3>8. Sin telemetría, el experimento es invisible <span class="sev med">Media prob.</span></h3>
+<div class="story">Diseño explícito "sin llamadas a casa" por respeto a la privacidad técnica. Cuando marketing pide "la lista de usuarios de S50Info" para la campaña, no existe ninguna lista, ningún email, ningún dato de qué comandos usan. El proyecto se cancela a los 6 meses sin haber sabido nunca si tuvo 10 o 10.000 usuarios reales, ni si alguno evaluó Sage50BI.</div>
+<div class="label">Supuesto</div>
+<div class="assump">La buena voluntad de una herramienta gratuita se traduce en conversión sin ningún mecanismo intermedio.</div>
+<div class="label">Señales tempranas</div>
+<ul><li>Ningún ticket del proyecto menciona "lead", "telemetría" o "conversión" en el diseño inicial</li><li>A las 4 semanas nadie puede responder "usuarios únicos activos" más allá de "descargas totales"</li></ul>
+</div>
+
+<div class="card" style="--accent:#f0a94e;">
+<h3>9. "Gratis" contamina la percepción de precio de Sage50BI <span class="sev med">Media prob.</span></h3>
+<div class="story">En el grupo de Telegram de partners: "¿el dashboard también es gratis o va a ser como el otro que luego te clavan?". Los prescriptores técnicos, con "ALCA TIC = la de la herramienta gratis" ya en la cabeza, transmiten esa etiqueta al cliente final antes de que el comercial entre en escena. El ciclo de venta de Sage50BI se alarga un 40% frente a la proyección.</div>
+<div class="label">Supuesto</div>
+<div class="assump">Gratis en un producto no contamina la percepción de precio de otro producto de la misma marca.</div>
+<div class="label">Señales tempranas</div>
+<ul><li>Menciones espontáneas que asocian la marca con "gratis" antes del lanzamiento de Sage50BI</li><li>Ciclo de venta más largo en cuentas donde el prescriptor ya usaba S50Info</li></ul>
+</div>
+
+</div>
+
+<footer>Premortem generado el 2026-07-30 · Objeto: estrategia de donación de S50Info a la comunidad como puente hacia Sage50BI · 9 agentes de análisis en paralelo, método Gary Klein</footer>

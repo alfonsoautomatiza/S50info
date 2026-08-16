@@ -1,0 +1,40 @@
+[build]
+output_dir = "exe"
+build_dir = "D:\\c"
+distribution_name = "S50info"
+
+[zip]
+exclude_dirs = ["entorno"]
+exclude_files = ["*.ini", "*.lic"]
+
+[project]
+main_script = "S50info.py"
+main_module_name = "S50info"
+root_globs = ["*.py"]
+
+[sources]
+packages = []
+
+[[external_libs.groups]]
+name = "werty"
+flatten = true
+env_var = "WERTY_LIBS_DIR"
+default_dir = "d:\\py\\@produxion\\@api\\mislibrerias"
+files = [
+    "libwertyconfig.py",
+    "libwertylog.py",
+]
+
+[[external_libs.groups]]
+name = "pysage50e"
+flatten = false
+dir = "d:\\py\\@produxion\\@api\\pysage50e\\pysage50e"
+files = ["*.py"]
+
+[[extra_copy]]
+src = "script\\"
+dest = "D:\\c\\s50info\\dist\\s50info\\script"
+
+[[extra_copy]]
+src = "config.ini"
+dest = "D:\\c\\s50info\\dist\\s50info\\config.ini"

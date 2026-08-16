@@ -1,0 +1,68 @@
+site_name: Manual de S50Info
+site_description: Manual técnico de S50Info para consultar, exportar y automatizar datos de SAGE50 desde la línea de comandos
+
+repo_url: https://github.com/wertyMSD/s50info
+repo_name: wertyMSD/s50info
+
+nav:
+  - Inicio: index.md
+  - Primeros pasos: primer-uso.md
+  - Referencia de comandos: comandos.md
+  - Automatización con scripts: scripts.md
+
+docs_dir: manual
+site_dir: site
+
+theme:
+  name: material
+  language: es
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Cambiar al modo claro
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: blue
+      accent: blue
+      toggle:
+        icon: material/brightness-7
+        name: Cambiar al modo oscuro
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: blue
+      accent: light blue
+      toggle:
+        icon: material/brightness-4
+        name: Usar la preferencia del sistema
+  features:
+    - navigation.path
+    - navigation.tracking
+    - navigation.top
+    - content.code.copy
+
+plugins:
+  - search:
+      lang: es
+
+markdown_extensions:
+  - toc:
+      permalink: true
+  - tables
+  - admonition
+
+validation:
+  nav:
+    omitted_files: warn
+    not_found: warn
+    absolute_links: warn
+  links:
+    not_found: warn
+    anchors: warn
+    absolute_links: warn
+    unrecognized_links: warn
+
+extra_css:
+  - stylesheets/extra.css
+
+copyright: "&copy; 2026 AlfonsoAutomatiza"
