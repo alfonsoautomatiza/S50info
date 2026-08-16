@@ -13,7 +13,24 @@ apiSage50.7z
 exe/
 resultados/
 temp/
+.atl/
 s50info.exe
 uv.lock
 licencia.lic
 config.ini
+
+manual/
+
+# Secrets / local env
+.env
+_.env
+c/RELEASE/.env
+
+# Build artifacts
+*.msix
+*.zip
+c/RELEASE/_internal/
+
+# Local tooling
+.codegraph/
+.licwerty/
