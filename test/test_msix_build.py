@@ -61,3 +61,37 @@ def test_asset_generation_fails_when_branded_source_is_missing(tmp_path):
 
     with pytest.raises(SystemExit, match="Branded Store asset source not found"):
         builder.write_assets(tmp_path, tmp_path / "missing.png")
+
+
+def test_copy_scripts_folder_ships_examples_into_staging(tmp_path):
+    builder = load_builder()
+    scripts_dir = tmp_path / "script"
+    scripts_dir.mkdir()
+    (scripts_dir / "ejemplo.py").write_text("print('hola')\n", encoding="utf-8")
+
+    builder.copy_scripts_folder(scripts_dir, tmp_path / "staging")
+
+    shipped = tmp_path / "staging" / "script" / "ejemplo.py"
+    assert shipped.is_file()
+    assert shipped.read_text(encoding="utf-8") == "print('hola')\n"
+
+
+def test_copy_scripts_folder_ignores_pycache(tmp_path):
+    builder = load_builder()
+    scripts_dir = tmp_path / "script"
+    (scripts_dir / "__pycache__").mkdir(parents=True)
+    (scripts_dir / "hola.py").write_text("print('hola')\n", encoding="utf-8")
+    (scripts_dir / "__pycache__" / "hola.cpython-313.pyc").write_bytes(b"\x00")
+
+    builder.copy_scripts_folder(scripts_dir, tmp_path / "staging")
+
+    staged_script = tmp_path / "staging" / "script"
+    assert (staged_script / "hola.py").is_file()
+    assert not (staged_script / "__pycache__").exists()
+
+
+def test_copy_scripts_folder_fails_when_missing(tmp_path):
+    builder = load_builder()
+
+    with pytest.raises(SystemExit, match="Scripts folder not found"):
+        builder.copy_scripts_folder(tmp_path / "missing", tmp_path / "staging")

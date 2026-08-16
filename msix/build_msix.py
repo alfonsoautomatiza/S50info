@@ -22,6 +22,7 @@ DEFAULT_PUBLISHER_DISPLAY_NAME = "InfoMSD"
 DEFAULT_BUILD_ROOT = r"D:\c\s50info\dist\s50info.exe"
 DEFAULT_OUTPUT_DIR = r"c\RELEASE"
 DEFAULT_ASSET_SOURCE = r"img\store\box_1x1_2160.png"
+DEFAULT_SCRIPTS_DIR = r"script"
 
 
 def parse_args() -> argparse.Namespace:
@@ -35,6 +36,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--build-root", default=DEFAULT_BUILD_ROOT)
     parser.add_argument("--output-dir", default=DEFAULT_OUTPUT_DIR)
     parser.add_argument("--asset-source", default=DEFAULT_ASSET_SOURCE)
+    parser.add_argument("--scripts-dir", default=DEFAULT_SCRIPTS_DIR)
     parser.add_argument("--makeappx-path", default="makeappx.exe")
     parser.add_argument("--signtool-path", default="signtool.exe")
     parser.add_argument("--certificate-path", default="")
@@ -196,6 +198,23 @@ def copy_build_output(build_root: Path, staging_dir: Path) -> None:
             shutil.copy2(item, target)
 
 
+def copy_scripts_folder(scripts_dir: Path, staging_dir: Path) -> None:
+    """Copy example scripts so the app can sync them into its state directory.
+
+    `s50info` copies `<exe_dir>/script` into %APPDATA%/s50info on first run;
+    the package must ship that folder or the sync silently does nothing.
+    """
+    if not scripts_dir.is_dir():
+        raise SystemExit(f"Scripts folder not found: {scripts_dir}")
+    if not any(scripts_dir.iterdir()):
+        raise SystemExit(f"Scripts folder is empty: {scripts_dir}")
+    shutil.copytree(
+        scripts_dir,
+        staging_dir / "script",
+        ignore=shutil.ignore_patterns("__pycache__", "*.pyc"),
+    )
+
+
 def run_command(command: list[str], label: str) -> None:
     print(" ".join(command))
     try:
@@ -217,6 +236,7 @@ def main() -> int:
     build_root = resolve_repo_path(root, args.build_root)
     output_dir = resolve_repo_path(root, args.output_dir)
     asset_source = resolve_repo_path(root, args.asset_source)
+    scripts_dir = resolve_repo_path(root, args.scripts_dir)
     output_package = output_dir / f"{args.package_name}-{version}.msix"
     makeappx_path = resolve_tool_path(args.makeappx_path, "makeappx.exe")
     signtool_path = resolve_tool_path(args.signtool_path, "signtool.exe")
@@ -228,6 +248,7 @@ def main() -> int:
         output_dir.mkdir(parents=True, exist_ok=True)
 
         copy_build_output(build_root, staging_dir)
+        copy_scripts_folder(scripts_dir, staging_dir)
         write_assets(staging_dir, asset_source)
         write_manifest(
             staging_dir=staging_dir,

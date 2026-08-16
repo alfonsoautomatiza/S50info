@@ -434,9 +434,22 @@ def create_zip_archive(source_path: Path) -> Path:
 
     zip_exclude_dirs, zip_exclude_files = load_zip_excludes()
     if source_path.is_file():
+        scripts_dir = PROJECT_ROOT / "script"
+        if not scripts_dir.is_dir() or not any(scripts_dir.iterdir()):
+            raise SystemExit(
+                f"Carpeta de scripts de ejemplo no disponible: {scripts_dir}. "
+                "s50info la copia a %APPDATA%/s50info en el primer arranque."
+            )
         with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
             archive.write(source_path, source_path.name)
-        created_count = 1
+            script_files = [
+                item
+                for item in sorted(scripts_dir.rglob("*"))
+                if item.is_file() and "__pycache__" not in item.parts and item.suffix != ".pyc"
+            ]
+            for script_file in script_files:
+                archive.write(script_file, Path("script") / script_file.relative_to(scripts_dir))
+        created_count = 1 + len(script_files)
         skipped_count = 0
     else:
         created_count, skipped_count = make_filtered_zip_archive(
