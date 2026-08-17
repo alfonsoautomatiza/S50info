@@ -1,0 +1,18 @@
+{
+  "project": "s50info",
+  "channel": "stable",
+  "latest": "2.1.9",
+  "key_id": "global-2026-01",
+  "generated_at": "2026-08-17T06:40:54.983901+00:00",
+  "releases": [
+    {
+      "version": "2.1.9",
+      "type": "full",
+      "target": "win-x64",
+      "url": "https://github.com/wertyMSD/s50info/releases/download/v2.1.9/s50info-2.1.9-win-x64-stable.zip",
+      "sha256": "8a48b2c646eb26113e9b2d91e385a5ef821a211c014dfa453bcef133c2bb761d",
+      "size": 99861062
+    }
+  ],
+  "signature": "r1HUFW61WNlyPMGWoJoIfETG53WOW6RNftN7Tr5hka2iS2PeQXuE60i5u+riC3RXJ98ty7sO0ZvGJseHJtKFBw=="
+}
