@@ -68,7 +68,7 @@
 
 <script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config","G-9FBB0G8XHG"),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","G-9FBB0G8XHG",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=G-9FBB0G8XHG",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
   
-    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+    <script>if("undefined"!=typeof __md_analytics){var consent=__md_get("__consent");consent&&consent.analytics&&__md_analytics()}</script>
   
 
     
@@ -841,32 +841,31 @@ consulta los <a href="https://github.com/alfonsoautomatiza/S50info/releases">rel
 <h3 id="cambios-principales">Cambios principales<a class="headerlink" href="#cambios-principales" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Subcomandos nuevos</strong>: la interfaz migró de banderas (<code>--sql</code>, <code>--exe</code>) a
-  subcomandos de Typer: <code>info</code>, <code>sql</code>, <code>export</code>, <code>run</code>, <code>reset</code>. La sintaxis
-  anterior ya no está disponible.</li>
+subcomandos de Typer: <code>info</code>, <code>sql</code>, <code>export</code>, <code>run</code>, <code>reset</code>. La sintaxis
+anterior ya no está disponible.</li>
 <li><strong>Asistente de configuración inicial</strong>: al ejecutar por primera vez,
-  S50Info detecta si falta <code>config.ini</code> y lanza un asistente interactivo para
-  configurar la ruta del terminal de Sage 50.</li>
+S50Info detecta si falta <code>config.ini</code> y lanza un asistente interactivo para
+configurar la ruta del terminal de Sage 50.</li>
 <li><strong>Configuración en <code>%APPDATA%/s50info/</code></strong>: el archivo <code>config.ini</code> y los
-  scripts de ejemplo se almacenan ahora en la carpeta de estado de la
-  aplicación, separados del ejecutable.</li>
+scripts de ejemplo se almacenan ahora en la carpeta de estado de la
+aplicación, separados del ejecutable.</li>
 <li><strong>MSIX para Microsoft Store</strong>: S50Info también se puede instalar desde
-  Microsoft Store (paquete <code>InfoMSD.s50info</code>).</li>
+Microsoft Store (paquete <code>InfoMSD.s50info</code>).</li>
 </ul>
 <h3 id="mejoras">Mejoras<a class="headerlink" href="#mejoras" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Scripts de ejemplo sincronizados automáticamente a <code>%APPDATA%/s50info/script/</code>
-  en el primer arranque.</li>
+en el primer arranque.</li>
 <li>Scripts nuevos: <code>exportacion_articulos.py</code> y
-  <code>visualizar_log_analisis_excel_reseteo.py</code>.</li>
+<code>visualizar_log_analisis_excel_reseteo.py</code>.</li>
 <li>Renombrado de módulos internos para mayor consistencia
-  (<code>s50proceso.py</code>, <code>s50script.py</code>, <code>s50setup.py</code>).</li>
+(<code>s50proceso.py</code>, <code>s50script.py</code>, <code>s50setup.py</code>).</li>
 <li>Logging de depuración integrado desde <code>pysage50e</code>.</li>
 <li>Tests unitarios añadidos para los módulos core.</li>
 </ul>
 <h3 id="distribucion">Distribución<a class="headerlink" href="#distribucion" title="Permanent link">&para;</a></h3>
 <ul>
 <li>ZIP con nombre versionado: <code>s50info-&lt;versión&gt;-win-x64-stable.zip</code>.</li>
-<li>Paquete MSIX sin firmar disponible para instalación local.</li>
 <li>MSIX firmado publicado en Microsoft Store.</li>
 </ul>
 
@@ -994,10 +993,88 @@ consulta los <a href="https://github.com/alfonsoautomatiza/S50info/releases">rel
     </div>
     
     
+      <div class="md-consent" data-md-component="consent" id="__consent" hidden>
+        <div class="md-consent__overlay"></div>
+        <aside class="md-consent__inner">
+          <form class="md-consent__form md-grid md-typeset" name="consent">
+            
+
+
+  
+
+
+<h4>Cookie consent</h4>
+<p>Este sitio utiliza Google Analytics para mejorar la experiencia. Los datos se recopilan de forma anónima.
+</p>
+<input class="md-toggle" type="checkbox" id="__settings" >
+<div class="md-consent__settings">
+  <ul class="task-list">
+    
+    
+    
+      
+        
+  
+  
+    
+    
+  
+  <li class="task-list-item">
+    <label class="task-list-control">
+      <input type="checkbox" name="github" checked>
+      <span class="task-list-indicator"></span>
+      GitHub
+    </label>
+  </li>
+
+      
+    
+    
+      
+        
+  
+  
+    
+    
+      
+    
+  
+  <li class="task-list-item">
+    <label class="task-list-control">
+      <input type="checkbox" name="analytics" checked>
+      <span class="task-list-indicator"></span>
+      Google Analytics
+    </label>
+  </li>
+
+      
+    
+  </ul>
+</div>
+<div class="md-consent__controls">
+  
+    
+      <button class="md-button md-button--primary">Aceptar</button>
+    
+    
+    
+  
+    
+    
+    
+      <label class="md-button" for="__settings">Gestionar cookies</label>
+    
+  
+</div>
+          </form>
+        </aside>
+      </div>
+      <script>var consent=__md_get("__consent");if(consent)for(var input of document.forms.consent.elements)input.name&&(input.checked=consent[input.name]||!1);else"file:"!==location.protocol&&setTimeout((function(){document.querySelector("[data-md-component=consent]").hidden=!1}),250);var form=document.forms.consent;for(var action of["submit","reset"])form.addEventListener(action,(function(e){if(e.preventDefault(),"reset"===e.type)for(var n of document.forms.consent.elements)n.name&&(n.checked=!1);__md_set("__consent",Object.fromEntries(Array.from(new FormData(form).keys()).map((function(e){return[e,!0]})))),location.hash="",location.reload()}))</script>
+    
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.sections", "navigation.top", "navigation.footer", "navigation.indexes", "content.code.copy", "search.highlight", "search.suggest", "announce.dismiss"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado al portapapeles", "clipboard.copy": "Copiar al portapapeles", "search.result.more.one": "1 m\u00e1s en esta p\u00e1gina", "search.result.more.other": "# m\u00e1s en esta p\u00e1gina", "search.result.none": "No se encontraron documentos", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Teclee para comenzar b\u00fasqueda", "search.result.term.missing": "Falta", "select.version": "Seleccionar versi\u00f3n"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.sections", "navigation.top", "navigation.footer", "navigation.indexes", "content.code.copy", "search.highlight", "search.suggest", "announce.dismiss", "consent"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado al portapapeles", "clipboard.copy": "Copiar al portapapeles", "search.result.more.one": "1 m\u00e1s en esta p\u00e1gina", "search.result.more.other": "# m\u00e1s en esta p\u00e1gina", "search.result.none": "No se encontraron documentos", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Teclee para comenzar b\u00fasqueda", "search.result.term.missing": "Falta", "select.version": "Seleccionar versi\u00f3n"}, "version": null}</script>
     
     
       <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
