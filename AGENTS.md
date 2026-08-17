@@ -24,16 +24,21 @@
 - Product metadata lives in `c/product.json`.
 - `pydobj.toml` is created separately with `pydobj init`; do not generate it from this template.
 - In ZIP mode, `c/build_exe.py` should place generated ZIPs in `c/RELEASE/` so `c/RELEASE/release.py` can consume them.
+- In ZIP mode, `c/build_exe.py` also stages the public release into the manual repo (`public_repo` in `c/product.json`): canonical versioned ZIP + `release.json` + `product.json` into `release-assets/`, and signs `manifest-<channel>.json` (same version as `release.json`) into `<updates_dir>/` via `pyupdategit build-manifest`.
+- `release-assets/` receives ONLY the ZIP + `release.json` + `product.json`; the MSIX is Store-only and is never copied there.
+- MSIX packages are generated exclusively in `D:\c\msix` (not in `c/RELEASE/`).
 - In `pyd` mode, compiled `.pyd` staging belongs in `c/RELEASE/_internal`.
 - In `full`/`zip` modes, `.last_build` should be generated at the very end of the successful build flow.
 
 ## Release workflow
-- Release script: `c/RELEASE/release.py`.
+- Publication is orchestrated by the `release-crm` skill from the manual repo's `release-assets/` (ZIP + `release.json` + `product.json`), after `c/build_exe.py` has signed the manifest.
+- `c/RELEASE/release.py` is the legacy alternative (signs + deploys on its own).
 - Release metadata: `c/RELEASE/release.json`.
 - Release documentation: `c/RELEASE/README.md`.
 - `release.json.version` must use strict `X.Y.Z` format.
 - `release.json.type`, when present, must be `partial` or `full`.
-- `UPDATE_PRIVATE_KEY` may be provided from the environment or from `c/RELEASE/.env`.
+- `UPDATE_PRIVATE_KEY` may be provided from the environment or from `c/RELEASE/.env` (build signs with it; `release-crm` does not need it).
+- `manifest_url` is baked into installed binaries: never change its value or the deployed updates path.
 
 ## Current status
 - New project generated from `D:\@plantilla`.

@@ -355,6 +355,11 @@ Ejecución: `pytest` desde la raíz del proyecto.
   - nombre del ZIP generado,
   - `type = "full"` cuando corresponda a una release base de major.
 - El ZIP generado debe ser el artefacto que luego consume `c/RELEASE/release.py`.
+- En modo `zip`, además prepara el staging público en el repo del manual (`public_repo` de `c/product.json`):
+  - copia el ZIP canónico versionado (`{project_id}-{version}-{target}-{channel}.zip`), `release.json` y `product.json` a `release-assets/`;
+  - firma `manifest-{channel}.json` con `pyupdategit build-manifest` en `<docs_repo>/<updates_dir>/`, con la misma versión que `release.json`;
+  - sin `UPDATE_PRIVATE_KEY` el build sigue completándose y solo se omite la firma (build dev).
+- `release-assets/` recibe ÚNICAMENTE el ZIP + `release.json` + `product.json`. El MSIX se distribuye solo por Microsoft Store y nunca se copia ahí.
 
 ### 14.2 Modo `pyd`
 
@@ -384,11 +389,10 @@ Normas obligatorias:
 
 ### 14.3 Publicación
 
-- La publicación final se realiza con `c/RELEASE/release.py`.
-- `release.py` firma siempre el manifest con `pyupdategit build-manifest`.
-- Después de crear/firmar el manifest, debe ejecutar `mkdocs gh-deploy --force` desde `docs_repo`.
-- Antes del deploy, limpia `docs/es` y recrea `<docs_repo>/<updates_dir>`.
-- Después del deploy, elimina `site/`.
+- La publicación final se orquesta con el skill `release-crm`, que consume los artefactos de `release-assets/` del repo del manual (ZIP + `release.json` + `product.json`) tras correr `c/build_exe.py`.
+- La firma del manifest la hace `c/build_exe.py` durante el build; el skill no necesita `UPDATE_PRIVATE_KEY`.
+- El manifest firmado vive en `<docs_repo>/<updates_dir>/manifest-{channel}.json` y su ruta desplegada debe coincidir con el `manifest_url` bakeado en los binarios (no moverlo ni cambiar `updates_dir`).
+- `c/RELEASE/release.py` queda como alternativa legacy: firma el manifest con `pyupdategit build-manifest`, limpia `<docs_repo>/<updates_dir>` antes del deploy, ejecuta `mkdocs gh-deploy --force` desde `docs_repo` y elimina `site/` después.
 
 ---
 

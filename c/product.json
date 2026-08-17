@@ -5,9 +5,15 @@
   "file_description": "Cli de consulta a SAGE50",
   "legal_copyright": "© 2026 AlfonsoAutomatiza",
   "key_id": "global-2026-01",
-  "manifest_url": "https://github.com/wertyMSD/s50info/updates/manifest-stable.json",
-  "github_owner": "wertyMSD",
-  "github_repo": "s50info",
+  "manifest_url": "https://github.com/alfonsoautomatiza/S50info/updates/manifest-stable.json",
+  "github_owner": "alfonsoautomatiza",
+  "github_repo": "S50info",
   "docs_repo": "C:\\Users\\alfonso\\@cowork\\cerebro\\000-PROYECTOS\\010 - MANUALES\\s50info",
-  "updates_dir": "docs/es/updates"
-  }
+  "updates_dir": "docs/updates",
+  "channel": "stable",
+  "target": "win-x64",
+  "release_repo": "alfonsoautomatiza/S50info",
+  "public_repo": "C:/Users/alfonso/@cowork/cerebro/000-PROYECTOS/010 - MANUALES/s50info",
+  "release_assets_subdir": "release-assets",
+  "engram_project": "s50info"
+}

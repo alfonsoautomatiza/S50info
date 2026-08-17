@@ -493,6 +493,214 @@ def sync_release_manifest_for_zip(info: ProductInfo, zip_path: Path) -> None:
     print(f"[build] release.json actualizado: {RELEASE_MANIFEST_FILE}")
 
 
+def resolve_public_assets_dir() -> Path | None:
+    """Devuelve la carpeta release-assets del repo publico desde product.json.
+
+    Cuando esta configurado, el zip publico, el release.json y product.json
+    se escriben directamente ahi (donde vive el manual), evitando duplicarlos
+    en el repo privado.
+    """
+    data = read_product_json()
+    public_repo_raw = product_text(data, "public_repo")
+    if not public_repo_raw:
+        return None
+    public_repo = Path(public_repo_raw.replace("\\", "/"))
+    if not public_repo.exists():
+        return None
+    subdir = product_text(data, "release_assets_subdir") or "release-assets"
+    return public_repo / subdir
+
+
+def stage_public_zip_archive(zip_source: Path, info: ProductInfo) -> Path | None:
+    """Copia el zip canonico publico a release-assets del repo del manual.
+
+    El zip canonico de GitHub Releases se llama
+    {project_id}-{version}-{target}-{channel}.zip. Se copia desde el zip
+    legacy recien creado en c/RELEASE (mismo contenido) para no comprimir
+    el dist dos veces. Devuelve None si public_repo no esta configurado
+    (el zip queda solo en c/RELEASE legacy).
+    """
+    assets_dir = resolve_public_assets_dir()
+    if assets_dir is None:
+        print("[build] 'public_repo' no configurado; zip publico omitido (solo c/RELEASE legacy)")
+        return None
+    assets_dir.mkdir(parents=True, exist_ok=True)
+
+    data = read_product_json()
+    channel = product_text_first(data, "channel", default="stable")
+    target = product_text_first(data, "target", default="win-x64")
+    zip_path = assets_dir / f"{info.project_id}-{info.version}-{target}-{channel}.zip"
+
+    shutil.copy2(zip_source, zip_path)
+    print(f"[build] ZIP publico copiado: {zip_path}")
+    return zip_path
+
+
+def sync_public_release_manifest_for_zip(info: ProductInfo, zip_path: Path) -> None:
+    """Actualiza el release.json publico en release-assets (version + zip canonico)."""
+    assets_dir = resolve_public_assets_dir()
+    if assets_dir is None:
+        return
+    manifest_file = assets_dir / "release.json"
+
+    release_data: dict[str, str] = {}
+    if manifest_file.exists():
+        try:
+            existing = json.loads(manifest_file.read_text(encoding="utf-8"))
+            if isinstance(existing, dict):
+                release_data = {str(k): v for k, v in existing.items()}
+        except json.JSONDecodeError as exc:
+            raise SystemExit(f"JSON invalido en {manifest_file}: {exc}") from exc
+
+    release_data["version"] = info.version
+    release_data["zip"] = zip_path.name
+    # Solo se fuerza "full" en versiones mayores (X.0.0). El resto de las
+    # veces se deja sin "type": release.py trata la ausencia como full
+    # (y rechaza "partial").
+    version_parts = parse_version_parts(info.version)
+    is_major_base_release = version_parts[1] == 0 and version_parts[2] == 0 and version_parts[3] == 0
+    if is_major_base_release:
+        release_data["type"] = "full"
+    else:
+        release_data.pop("type", None)
+    release_data.setdefault("notes", "")
+
+    manifest_file.write_text(
+        json.dumps(release_data, indent=4, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+    print(f"[build] release.json publico actualizado: {manifest_file}")
+
+
+def load_env_value_from_file(env_file: Path, key: str) -> str | None:
+    """Lee una linea KEY=VALUE de un fichero .env (igual que release.py)."""
+    if not env_file.exists():
+        return None
+    try:
+        for line in env_file.read_text(encoding="utf-8").splitlines():
+            raw = line.strip()
+            if not raw or raw.startswith("#") or "=" not in raw:
+                continue
+            left, right = raw.split("=", 1)
+            if left.strip() != key:
+                continue
+            value = right.strip()
+            if len(value) >= 2 and value[0] == value[-1] and value[0] in {'"', "'"}:
+                value = value[1:-1]
+            return value
+    except OSError:
+        return None
+    return None
+
+
+def load_signing_key_for_build() -> str | None:
+    """Devuelve UPDATE_PRIVATE_KEY del entorno o de un .env local.
+
+    Devuelve None (nunca falla) para que un build dev sin clave siga
+    produciendo el zip publico; solo se omite la firma del manifest.
+    Candidatos .env: c/RELEASE (convencion de release.py), c/ y raiz.
+    """
+    signing_key = os.environ.get("UPDATE_PRIVATE_KEY")
+    if signing_key:
+        return signing_key
+    for env_file in (C_RELEASE_DIR / ".env", _SCRIPT_DIR / ".env", PROJECT_ROOT / ".env"):
+        if env_file.exists():
+            candidate = load_env_value_from_file(env_file, "UPDATE_PRIVATE_KEY")
+            if candidate:
+                os.environ["UPDATE_PRIVATE_KEY"] = candidate
+                print(f"[build] UPDATE_PRIVATE_KEY cargada desde {env_file}")
+                return candidate
+    return None
+
+
+def sign_and_stage_public_release(info: ProductInfo, zip_path: Path) -> None:
+    """Firma el manifest de actualizacion y prepara el staging publico.
+
+    Corre al final del build (zip ya generado): firma manifest-{channel}.json
+    (pyupdategit) dentro de <updates_dir>/ del repo publico — con url de
+    descarga del zip canonico en GitHub Releases — y deja en release-assets/
+    el zip, release.json y product.json para que el skill de release publique.
+    El MSIX NO se copia nunca a release-assets: se distribuye solo por
+    Microsoft Store. Sin UPDATE_PRIVATE_KEY solo se omite la firma (dev
+    build); el staging sigue completandose.
+    """
+    data = read_product_json()
+    public_repo_raw = product_text(data, "public_repo")
+    if not public_repo_raw:
+        print("[build] 'public_repo' no definido en product.json; se omite staging publico")
+        return
+    public_repo = Path(public_repo_raw.replace("\\", "/"))
+    if not public_repo.exists():
+        raise SystemExit(f"public_repo no existe: {public_repo}")
+
+    channel = product_text_first(data, "channel", default="stable")
+    target = product_text_first(data, "target", default="win-x64")
+    release_repo = product_text(data, "release_repo")
+    if not release_repo:
+        owner = product_text(data, "github_owner")
+        repo = product_text(data, "github_repo")
+        if owner and repo:
+            release_repo = f"{owner}/{repo}"
+    if not release_repo:
+        raise SystemExit(
+            "release_repo (ni github_owner/github_repo) definido en product.json; "
+            "no se puede derivar la URL de descarga del manifest"
+        )
+    key_id = product_text(data, "key_id")
+    if not key_id:
+        raise SystemExit("key_id no definido en product.json; no se puede firmar el manifest")
+
+    assets_subdir = product_text(data, "release_assets_subdir") or "release-assets"
+    assets_dir = public_repo / assets_subdir
+    assets_dir.mkdir(parents=True, exist_ok=True)
+
+    # Staging de assets (siempre, tambien en dev sin clave de firma).
+    # Solo zip + release.json + product.json: el MSIX va exclusivamente
+    # a Microsoft Store.
+    dest_zip = assets_dir / zip_path.name
+    if zip_path.resolve() != dest_zip.resolve():
+        shutil.copy2(zip_path, dest_zip)
+        print(f"[build] ZIP publico copiado a: {dest_zip}")
+    else:
+        print(f"[build] ZIP publico ya en: {dest_zip}")
+
+    shutil.copy2(PRODUCT_FILE, assets_dir / "product.json")
+    print(f"[build] product.json copiado a: {assets_dir / 'product.json'}")
+
+    signing_key = load_signing_key_for_build()
+    if not signing_key:
+        print_alert(
+            "UPDATE_PRIVATE_KEY no disponible; se omite la firma del manifest publico "
+            "(zip y staging quedan listos en el repo publico)"
+        )
+        return
+
+    version = info.version
+    download_url = f"https://github.com/{release_repo}/releases/download/v{version}/{zip_path.name}"
+    updates_dir = public_repo / (product_text(data, "updates_dir") or "docs/updates").replace("\\", "/")
+    updates_dir.mkdir(parents=True, exist_ok=True)
+    manifest_path = updates_dir / f"manifest-{channel}.json"
+
+    args_manifest = [
+        "pyupdategit", "build-manifest",
+        "--project", info.project_id,
+        "--channel", channel,
+        "--version", version,
+        "--key-id", key_id,
+        "--signing-key-env", "UPDATE_PRIVATE_KEY",
+        "--release-file", str(zip_path),
+        "--release-type", "full",
+        "--release-target", target,
+        "--release-url", download_url,
+        "--output", str(manifest_path),
+    ]
+    print_step("Firmando manifest para repo publico")
+    result = subprocess.run(args_manifest, cwd=str(PROJECT_ROOT))
+    if result.returncode != 0:
+        raise SystemExit("build_manifest fallo; el manifest no se firmo")
+    print(f"[build] Manifest firmado: {manifest_path}")
+
+
 def as_string_list(value: object, label: str) -> list[str]:
     if value is None:
         return []
@@ -1105,6 +1313,15 @@ def main() -> None:
     if BUILD_MODE == "zip":
         zip_path = create_zip_archive(target_exe)
         sync_release_manifest_for_zip(product_info, zip_path)
+
+        # Staging publico (repo del manual): zip canonico versionado,
+        # release.json publico, product.json y firma del manifest.
+        # c/RELEASE (zip + release.json legacy) queda intacto para
+        # release.py; esto se anade al lado, no lo reemplaza.
+        public_zip_path = stage_public_zip_archive(zip_path, product_info)
+        if public_zip_path is not None:
+            sync_public_release_manifest_for_zip(product_info, public_zip_path)
+            sign_and_stage_public_release(product_info, public_zip_path)
 
     run_msix_builder(target_exe)
 
