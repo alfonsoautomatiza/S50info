@@ -119,7 +119,7 @@
   }
 }
 
-/* Floating action button — Reportar incidencia */
+/* Floating action button — Enviar incidencia */
 .s50-fab {
   position: fixed;
   bottom: 2rem;
@@ -127,21 +127,22 @@
   z-index: 1000;
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 3rem;
-  height: 3rem;
-  border-radius: 50%;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 2rem;
   background-color: var(--md-accent-fg-color);
   color: var(--md-primary-bg-color);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
   transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
   text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
 }
 
 .s50-fab:hover {
   background-color: #d32f2f;
   color: var(--md-primary-bg-color);
-  transform: scale(1.1);
+  transform: scale(1.05);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
 }
 
@@ -149,9 +150,19 @@
   transform: scale(0.95);
 }
 
+.s50-fab__text {
+  white-space: nowrap;
+}
+
 @media (max-width: 44.984375em) {
   .s50-fab {
     bottom: 1.25rem;
     right: 1.25rem;
+    padding: 0.6rem 1rem;
+    font-size: 0.8rem;
+  }
+
+  .s50-fab__text {
+    display: none;
   }
 }
