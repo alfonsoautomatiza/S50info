@@ -277,6 +277,8 @@ def main(
     ),
 ):
     _inicializar_directorio_trabajo()
+    if ctx.invoked_subcommand is None:
+        rprint(f"[dim]Directorio de trabajo: {Path.cwd()}[/dim]")
     if ctx.invoked_subcommand is not None:
         return
 

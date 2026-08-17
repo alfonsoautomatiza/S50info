@@ -194,6 +194,46 @@ class TestInfo:
         assert "********" in output
         assert "super-secret" not in output
 
+    @patch("s50proceso.rprint")
+    def test_configuracion_activa_enmascara_password_sage50(
+        self, mock_rprint, mock_api_with_config
+    ):
+        mock_api_with_config.confsage50.cvariables = {
+            "config_sage50#empresa": "MiEmpresa",
+            "config_sage50#password": "secreto-sage50",
+        }
+        proc = proceso(api=mock_api_with_config)
+
+        proc._mostrar_configuracion_activa()
+
+        output = "\n".join(str(call.args[0]) for call in mock_rprint.call_args_list)
+        assert "Password SAGE50" in output
+        assert "********" in output
+        assert "secreto-sage50" not in output
+
+    @patch("s50proceso.rprint")
+    def test_configuracion_activa_enmascara_cualquier_clave_password(
+        self, mock_rprint, mock_api_with_config
+    ):
+        secretos = {
+            "api#password": "secreto-sql-9Z",
+            "config_sage50#password": "secreto-sage-8Y",
+            "otra#Password_Webhook": "secreto-hook-7X",
+        }
+        mock_api_with_config.confsage50.cvariables = {
+            **secretos,
+            "api#terminal": "C:\\Sage\\Term01",
+        }
+        proc = proceso(api=mock_api_with_config)
+
+        proc._mostrar_configuracion_activa()
+
+        output = "\n".join(str(call.args[0]) for call in mock_rprint.call_args_list)
+        for secreto in secretos.values():
+            assert secreto not in output
+        assert "********" in output
+        assert "C:\\Sage\\Term01" in output
+
 
 class TestImprimirDiccionarios:
     """Tests para el método imprimir_diccionarios"""

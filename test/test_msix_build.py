@@ -1,4 +1,5 @@
 import importlib.util
+import tempfile
 from pathlib import Path
 from xml.etree import ElementTree
 
@@ -95,3 +96,23 @@ def test_copy_scripts_folder_fails_when_missing(tmp_path):
 
     with pytest.raises(SystemExit, match="Scripts folder not found"):
         builder.copy_scripts_folder(tmp_path / "missing", tmp_path / "staging")
+
+
+def test_default_output_dir_is_exclusive_msix_folder():
+    builder = load_builder()
+
+    assert builder.DEFAULT_OUTPUT_DIR == r"D:\c\msix"
+
+
+def test_staging_dir_is_isolated_from_repo_msix_source(tmp_path, monkeypatch):
+    builder = load_builder()
+    monkeypatch.setattr("tempfile.tempdir", str(tmp_path))
+
+    staging = builder.create_staging_directory()
+
+    assert staging.is_dir()
+    assert not any(staging.iterdir()), "staging debe empezar vacío"
+    assert staging.resolve() != BUILDER_PATH.parent.resolve(), (
+        "staging nunca debe ser el directorio fuente msix/ del repo"
+    )
+    assert staging.resolve().is_relative_to(tmp_path.resolve())

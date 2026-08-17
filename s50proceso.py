@@ -600,7 +600,7 @@ class proceso:
 
         for clave in [*claves_ordenadas, *claves_restantes]:
             etiqueta = etiquetas.get(clave, clave)
-            valor = "********" if clave == "api#password" else cvariables[clave]
+            valor = "********" if "password" in clave.lower() else cvariables[clave]
             rprint(f"[cyan]{etiqueta}[/cyan]: {valor}")
 
     def info(self, pausa=True, grupo_comunes=None):

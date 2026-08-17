@@ -40,6 +40,16 @@
 - `UPDATE_PRIVATE_KEY` may be provided from the environment or from `c/RELEASE/.env` (build signs with it; `release-crm` does not need it).
 - `manifest_url` is baked into installed binaries: never change its value or the deployed updates path.
 
+## Skills de referencia
+- **release-crm** (`C:\Users\alfonso\.config\opencode\skills\release-crm\SKILL.md`): orquesta el release completo. Ejecutar siempre que se publique una versión. Contiene:
+  - Flujo de publicación (GitHub Release + gh-pages + README/LICENSE).
+  - Modelos de repo (A = distribución separada, B = mismo repo).
+  - Prerrequisitos y guardas obligatorias.
+  - Botón flotante "Enviar incidencia" (FAB): patrón reutilizable en `assets/` con CSS + HTML override para MkDocs Material.
+- **crm-docs-release** (sub-skill): novedades desde Engram + enriquecimiento SEO + gate de imágenes. Se ejecuta ANTES del deploy.
+- **crm-docs** (sub-skill): enriquecimiento de documentación (SEO, compresión, imágenes).
+- Antes de cada release, revisar si hay mejoras o campos nuevos en estos skills que apliquen a este proyecto.
+
 ## Current status
 - New project generated from `D:\@plantilla`.
 - Review and complete `c/product.json` release paths before first production release.

@@ -9,6 +9,7 @@ import os
 import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 from xml.sax.saxutils import escape, quoteattr
 
@@ -20,7 +21,7 @@ DEFAULT_PUBLISHER = "CN=D75F3D07-BF68-4BB3-B36C-5A12A1A03277"
 DEFAULT_DISPLAY_NAME = "s50info"
 DEFAULT_PUBLISHER_DISPLAY_NAME = "InfoMSD"
 DEFAULT_BUILD_ROOT = r"D:\c\s50info\dist\s50info.exe"
-DEFAULT_OUTPUT_DIR = r"c\RELEASE"
+DEFAULT_OUTPUT_DIR = r"D:\c\msix"
 DEFAULT_ASSET_SOURCE = r"img\store\box_1x1_2160.png"
 DEFAULT_SCRIPTS_DIR = r"script"
 
@@ -198,6 +199,16 @@ def copy_build_output(build_root: Path, staging_dir: Path) -> None:
             shutil.copy2(item, target)
 
 
+def create_staging_directory() -> Path:
+    """Create an isolated staging dir outside the repository.
+
+    Staging must never be the repo's msix/ source folder: rmtree-ing it
+    would delete tracked files (AppxManifest.xml, Assets/) and any
+    uncommitted work on an interrupted build.
+    """
+    return Path(tempfile.mkdtemp(prefix="s50info_msix_staging_"))
+
+
 def copy_scripts_folder(scripts_dir: Path, staging_dir: Path) -> None:
     """Copy example scripts so the app can sync them into its state directory.
 
@@ -228,11 +239,9 @@ def run_command(command: list[str], label: str) -> None:
 def main() -> int:
     args = parse_args()
     root = repo_root()
-    staging_dir = root / "msix"
-    script_path = Path(__file__).resolve()
-    script_bytes = script_path.read_bytes()
 
     version = read_msix_version(root)
+    staging_dir = create_staging_directory()
     build_root = resolve_repo_path(root, args.build_root)
     output_dir = resolve_repo_path(root, args.output_dir)
     asset_source = resolve_repo_path(root, args.asset_source)
@@ -242,9 +251,6 @@ def main() -> int:
     signtool_path = resolve_tool_path(args.signtool_path, "signtool.exe")
 
     try:
-        if staging_dir.exists():
-            shutil.rmtree(staging_dir)
-        staging_dir.mkdir(parents=True)
         output_dir.mkdir(parents=True, exist_ok=True)
 
         copy_build_output(build_root, staging_dir)
@@ -303,8 +309,7 @@ def main() -> int:
         print(f"MSIX ready: {output_package}")
         return 0
     finally:
-        staging_dir.mkdir(parents=True, exist_ok=True)
-        script_path.write_bytes(script_bytes)
+        shutil.rmtree(staging_dir, ignore_errors=True)
 
 
 if __name__ == "__main__":
