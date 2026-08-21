@@ -57,6 +57,34 @@ def test_branded_assets_are_generated_and_referenced_by_manifest(tmp_path):
     assert visual.attrib["Square150x150Logo"] == r"Assets\Square150x150Logo.png"
 
 
+def test_manifest_declares_app_execution_alias(tmp_path):
+    builder = load_builder()
+    source = ROOT / "img" / "store" / "box_1x1_2160.png"
+
+    builder.write_assets(tmp_path, source)
+    builder.write_manifest(
+        tmp_path,
+        package_name="InfoMSD.s50info",
+        publisher="CN=publisher",
+        version="1.2.3.0",
+        display_name="s50info",
+        publisher_display_name="InfoMSD",
+    )
+
+    manifest = ElementTree.parse(tmp_path / "AppxManifest.xml")
+    namespace = {
+        "appx": "http://schemas.microsoft.com/appx/manifest/foundation/windows10",
+        "uap5": "http://schemas.microsoft.com/appx/manifest/uap/windows10/5",
+    }
+    alias = manifest.find(
+        "appx:Applications/appx:Application/appx:Extensions/"
+        "uap5:Extension/uap5:AppExecutionAlias/uap5:ExecutionAlias",
+        namespace,
+    )
+    assert alias is not None
+    assert alias.attrib["Alias"] == "s50info.exe"
+
+
 def test_asset_generation_fails_when_branded_source_is_missing(tmp_path):
     builder = load_builder()
 

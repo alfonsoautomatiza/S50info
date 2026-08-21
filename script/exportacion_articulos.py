@@ -43,13 +43,13 @@ def exportar_articulos_por_year():
         select codigo, nombre, familia
         from #articulo
         """,
-        sqlyear="2025JX",
+        sqlyear="2025",
     )
-    print(f"Articulos recuperados (2025JX): {len(datos)}")
+    print(f"Articulos recuperados (2025): {len(datos)}")
     proceso.imprimir_diccionarios(
         datos,
         formato="csv",
-        nombre_archivo="articulos_2025JX",
+        nombre_archivo="articulos_2025",
         comprimir=False,
     )
 

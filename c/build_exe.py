@@ -28,6 +28,14 @@ import zipfile
 from dataclasses import dataclass
 from pathlib import Path
 
+# VS Build Tools: vsdevcmd.bat runs bare `vswhere.exe` after pushd to the
+# Installer dir, which requires cmd.exe to search the current directory.
+# When NoDefaultCurrentDirectoryInExePath is set (injected by some agent/CI
+# hosts), that lookup fails and setuptools reports "Unable to find a
+# compatible Visual Studio installation". Remove it before any compilation
+# so the clean environment propagates to pydobj and other child processes.
+os.environ.pop("NoDefaultCurrentDirectoryInExePath", None)
+
 _SCRIPT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = _SCRIPT_DIR.parent
 
@@ -216,6 +224,7 @@ WORK_DIR = resolve_config_path("D:/temp") / PROJECT_NAME / "build"
 MAIN_SCRIPT = PROJECT_ROOT / f"{ENTRY_NAME}.py"
 SPEC_FILE = PROJECT_ROOT / f"{ENTRY_NAME}.spec"
 VERSION_FILE = PROJECT_ROOT / "c" / "version.txt"
+VERSION_MODULE = PROJECT_ROOT / "s50version.py"
 ICON_FILE = PROJECT_ROOT / "img" / "hola.ico"
 INSTALLER_VERSION_FILE = PROJECT_ROOT / "instalador" / "version_auto.iss"
 CHANNELS = ("release", "full")
@@ -376,6 +385,20 @@ def sync_version_file(info: ProductInfo) -> None:
     VERSION_FILE.parent.mkdir(parents=True, exist_ok=True)
     VERSION_FILE.write_text(render_version_resource(info), encoding="utf-16")
     print(f"[build] Derivado actualizado: {VERSION_FILE}")
+
+
+def render_version_module(info: ProductInfo) -> str:
+    return (
+        '"""Versión de s50info en runtime.\n\n'
+        "Generado por c/build_exe.py desde c/product.json. No editar a mano.\n"
+        '"""\n'
+        f'__version__ = "{info.version}"\n'
+    )
+
+
+def sync_version_module(info: ProductInfo) -> None:
+    VERSION_MODULE.write_text(render_version_module(info), encoding="utf-8")
+    print(f"[build] Derivado actualizado: {VERSION_MODULE}")
 
 
 def sync_installer_version(info: ProductInfo) -> None:
@@ -938,6 +961,7 @@ def make_filtered_zip_archive(
 
 
 def sync_derived_files(info: ProductInfo) -> dict[str, Path]:
+    sync_version_module(info)
     sync_version_file(info)
     sync_installer_version(info)
     if BUILD_MODE == "zip":

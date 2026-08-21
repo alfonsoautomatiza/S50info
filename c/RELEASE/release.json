@@ -1,5 +1,5 @@
 {
-    "version": "2.1.9",
+    "version": "2.2.2",
     "zip": "s50info.zip",
-    "notes": ""
+    "notes": "Panel de novedades al iniciar (bienvenida en primera ejecución y resumen de cambios tras cada actualización), contraseñas enmascaradas en la configuración, alias 's50info' en cualquier consola al instalar desde Microsoft Store, correcciones de estabilidad y tests ampliados."
 }

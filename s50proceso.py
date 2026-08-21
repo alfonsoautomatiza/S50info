@@ -10,7 +10,7 @@ from pathlib import Path
 import libwertyconfig
 from rich import print as rprint
 
-SAGE50BI_URL = os.getenv("SAGE50BI_URL", "https://sage50eia.com/s50info")
+SAGE50BI_URL = os.getenv("SAGE50BI_URL", "https://www.alfonsoautomatiza.com/s50-bi")
 
 
 def _default_config_path():
@@ -513,7 +513,7 @@ class proceso:
             raise ValueError("No se pudo interpretar la consulta para aplicar --groupby.")
 
         select_clause = cuerpo[:idx_from].strip()
-        from_clause = cuerpo[idx_from + 6 :].strip()
+        from_clause = cuerpo[idx_from + len("FROM") :].lstrip()
         if "SELECT" in select_clause.upper():
             raise ValueError("--groupby no soporta subconsultas en la lista SELECT.")
         return select_clause, from_clause

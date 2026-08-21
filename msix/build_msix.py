@@ -144,8 +144,9 @@ def write_manifest(
     manifest = f'''<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
          xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+         xmlns:uap5="http://schemas.microsoft.com/appx/manifest/uap/windows10/5"
          xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
-         IgnorableNamespaces="uap rescap">
+         IgnorableNamespaces="uap rescap uap5">
   <Identity Name={quoteattr(package_name)}
             Publisher={quoteattr(publisher)}
             Version={quoteattr(version)} />
@@ -167,6 +168,15 @@ def write_manifest(
                           BackgroundColor="transparent"
                           Square150x150Logo="Assets\\Square150x150Logo.png"
                           Square44x44Logo="Assets\\Square44x44Logo.png" />
+      <Extensions>
+        <uap5:Extension Category="windows.appExecutionAlias"
+                          Executable="s50info.exe"
+                          EntryPoint="Windows.FullTrustApplication">
+          <uap5:AppExecutionAlias>
+            <uap5:ExecutionAlias Alias="s50info.exe" />
+          </uap5:AppExecutionAlias>
+        </uap5:Extension>
+      </Extensions>
     </Application>
   </Applications>
   <Capabilities>

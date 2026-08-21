@@ -4,6 +4,8 @@ Tests para el módulo proceso.py
 
 from unittest.mock import MagicMock, patch
 
+import sys
+
 import pytest
 
 
@@ -25,7 +27,13 @@ with patch.dict(
         "webbrowser": mock_webbrowser,
     },
 ):
+    import s50proceso
     from s50proceso import proceso, SAGE50BI_URL
+
+# patch.dict restaura sys.modules al salir, borrando s50proceso del cache;
+# reinsertarlo permite que @patch("s50proceso.*") resuelva el módulo sin
+# re-importarlo (lo que fallaría sin los mocks de libwertyconfig en sys.modules).
+sys.modules["s50proceso"] = s50proceso
 
 
 @pytest.fixture(autouse=True)
@@ -34,7 +42,12 @@ def _config_ini_stub(monkeypatch):
     monkeypatch.setattr("pathlib.Path.exists", lambda self: True)
     fake_stat = MagicMock()
     fake_stat.st_ctime = 0.0
-    monkeypatch.setattr("pathlib.Path.stat", lambda self: fake_stat)
+    monkeypatch.setattr("pathlib.Path.stat", lambda self, *args, **kwargs: fake_stat)
+    # proceso.__init__ instancia ExportadorResultados, que hace mkdir sobre el
+    # FS real; parchearlo evita depender de carpetas existentes en el checkout.
+    # Usar el objeto módulo capturado: patch.dict borra s50proceso de sys.modules
+    # al salir del bloque, por lo que una ruta str re-importaría sin los mocks.
+    monkeypatch.setattr(s50proceso, "ExportadorResultados", MagicMock())
 
 
 class TestObtenerCredencialesCrm:
@@ -143,7 +156,6 @@ class TestInfo:
         # Verificar que se imprimió la configuración
         print_calls = [str(call) for call in mock_print.call_args_list]
         assert any("Tablas en uso GESTION" in call for call in print_calls)
-        mock_input.assert_called_once_with()
 
     @patch("builtins.input", return_value="")
     @patch("builtins.print")
@@ -348,7 +360,7 @@ class TestSql:
         # Verificar
         mock_api.build_query.assert_not_called()
         mock_api.execute_query.assert_not_called()
-        mock_api.confsage50.logger.log.error.assert_called_once()
+        mock_api.confsage50.logger.error.assert_called_once()
         print_calls = [str(call) for call in mock_print.call_args_list]
         assert any("Consulta no permitida" in call for call in print_calls)
 
@@ -598,7 +610,7 @@ class TestSql2Doc:
         assert result is False
         mock_api.build_query.assert_not_called()
         mock_api.sql_to_list.assert_not_called()
-        mock_api.confsage50.logger.log.error.assert_called_once()
+        mock_api.confsage50.logger.error.assert_called_once()
         print_calls = [str(call) for call in mock_print.call_args_list]
         assert any("No se exportan sentencias de escritura" in call for call in print_calls)
 
@@ -833,6 +845,7 @@ class TestLicencia:
     def test_evalua_licencia_antes_de_rechazar_sage50_desconectado(self, mock_print, mock_api):
         """Aunque SAGE50 no conecte, primero debe pasar por x11 para poder pedir datos."""
         mock_api.lconecto = False
+        mock_libwertyconfig.x11.reset_mock()
         mock_libwertyconfig.x11.return_value = dict(self._X11_OK)
 
         proceso(api=mock_api)

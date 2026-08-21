@@ -317,8 +317,8 @@ def asistente_terminal(
 
         if accion == "manual":
             mostrar(
-                "[dim]El terminal es la carpeta de SAGE 50 que contiene config.ini "
-                "(p.ej. C:\\Sage50\\Sage50Term).[/dim]"
+                "[grey70]El terminal es la carpeta de SAGE 50 que contiene config.ini "
+                "(p.ej. C:\\Sage50\\Sage50Term).[/grey70]"
             )
             try:
                 ruta_raw = pedir_ruta("Carpeta del terminal SAGE 50")
@@ -338,8 +338,8 @@ def asistente_terminal(
         if accion == "descargar":
             mostrar(f"[cyan]Abriendo la descarga de SAGE 50: {SAGE50_DOWNLOAD_URL}[/cyan]")
             mostrar(
-                "[dim]Instala SAGE 50 y vuelve al menú para detectarlo "
-                "automáticamente.[/dim]"
+                "[grey70]Instala SAGE 50 y vuelve al menú para detectarlo "
+                "automáticamente.[/grey70]"
             )
             try:
                 abrir_url(SAGE50_DOWNLOAD_URL)
