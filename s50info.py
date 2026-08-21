@@ -10,12 +10,16 @@ from pathlib import Path
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 import typer
+import click
 from pysage50e import apiSAGE50
 from pysage50e.sage_debug_config import configure_debug_logging
 from rich import print as rprint
 from rich.panel import Panel
 
 import s50setup
+import s50onboarding
+import s50store
+from s50version import __version__ as S50INFO_VERSION
 
 try:
     import s50proceso
@@ -33,7 +37,8 @@ except Exception as e:
 # Activar DEBUG detallado si .env tiene DEBUG=True/Si/1
 _debug_active = configure_debug_logging()
 
-SAGE50BI_URL = os.getenv("SAGE50BI_URL", "https://sage50eia.com/s50info")
+MANUAL_URL = os.getenv("MANUAL_URL", "https://sage50eia.com/s50info")
+SAGE50BI_URL = os.getenv("SAGE50BI_URL", "https://www.alfonsoautomatiza.com/s50-bi")
 USAGE_PROMPT_FIRST_USE = 5
 USAGE_PROMPT_INTERVAL = 20
 USAGE_PROMPT_FILE = "usage_prompt.json"
@@ -49,7 +54,7 @@ app = typer.Typer(
     context_settings={"help_option_names": ["-h", "--help"]},
     help=(
         "S50Info - herramienta CLI para consultar, exportar y mantener SAGE50. "
-        "Usa los subcomandos `info`, `sql`, `export`, `run` y `reset`."
+        "Usa los subcomandos `info`, `sql`, `export`, `run`, `reset`, `manual` y `version`."
     ),
 )
 
@@ -114,15 +119,15 @@ def _ejecutar_asistente_terminal(config_path) -> bool:
     if terminal is None:
         rprint()
         rprint("[yellow]Sin un SAGE 50 instalado, s50info no puede consultar datos.[/yellow]")
-        rprint("[dim]Vuelve a ejecutar s50info cuando SAGE 50 esté instalado.[/dim]")
+        rprint("[grey70]Vuelve a ejecutar s50info cuando SAGE 50 esté instalado.[/grey70]")
         return False
     return True
 
 
 def _crear_proceso():
     try:
-        rprint(f"[dim]Directorio Config.ini: {_app_state_dir()}[/dim]")
-        rprint("[dim]Conectando a SAGE50...[/dim]")
+        rprint(f"[grey70]Directorio Config.ini: {_app_state_dir()}[/grey70]")
+        rprint("[grey70]Conectando a SAGE50...[/grey70]")
         config_path = _ensure_config_path()
         for intento in range(2):
             if s50setup.necesita_asistente(config_path) and not _ejecutar_asistente_terminal(
@@ -266,6 +271,30 @@ def _normalizar_sqlyear_desde_shell(ctx: typer.Context, sqlyear: str) -> str:
     return sqlyear
 
 
+def _abrir_manual() -> None:
+    """Abre el manual que proporciona la licencia en el navegador."""
+    s50setup._abrir_url(MANUAL_URL)
+
+
+def _recordar_ayuda() -> None:
+    rprint("[grey70]Usa -h o --help para ver la lista de comandos.[/grey70]")
+
+
+def _recordar_sage50bi() -> None:
+    """Llamada a Sage50BI: sutil, clara de que es otro producto, y vistosa."""
+    rprint(
+        Panel(
+            "¿Necesitas [bold]informes y cuadros de mando visuales[/bold] de tu SAGE50,\n"
+            "sin comandos ni programación?\n\n"
+            "También hacemos [bold cyan]Sage50BI[/bold cyan]: otro producto, pensado\n"
+            "para perfiles no técnicos.\n"
+            f"[link={SAGE50BI_URL}]→ Descubre Sage50BI[/link]",
+            title="[bold cyan]Sage50BI · informes visuales[/bold cyan]",
+            border_style="cyan",
+        )
+    )
+
+
 @app.callback(invoke_without_command=True)
 def main(
     ctx: typer.Context,
@@ -275,10 +304,39 @@ def main(
         "-c",
         help="Grupo de comunes a usar. Si no se indica, se toma el de config.ini.",
     ),
+    manual: bool = typer.Option(
+        False,
+        "--manual",
+        "-m",
+        "--m",
+        help="Abre el manual que proporciona la licencia en el navegador.",
+    ),
+    version: bool = typer.Option(
+        False,
+        "--version",
+        "-v",
+        "--v",
+        help="Muestra la versión del programa.",
+    ),
 ):
+    if version:
+        rprint(f"s50info v{S50INFO_VERSION}")
+        _recordar_ayuda()
+        raise typer.Exit()
+    if manual:
+        _abrir_manual()
+        rprint(f"[grey70]Manual: {MANUAL_URL}[/grey70]")
+        _recordar_ayuda()
+        raise typer.Exit()
+
+    # Puerta de actualización obligatoria (solo instalaciones MSIX/Store).
+    if s50store.puerta_update_obligatorio(nombre_app="s50info"):
+        raise typer.Exit(1)
+
     _inicializar_directorio_trabajo()
+    s50onboarding.mostrar_if_necesario(_app_state_dir())
     if ctx.invoked_subcommand is None:
-        rprint(f"[dim]Directorio de trabajo: {Path.cwd()}[/dim]")
+        rprint(f"[grey70]Directorio de trabajo: {Path.cwd()}[/grey70]")
     if ctx.invoked_subcommand is not None:
         return
 
@@ -289,11 +347,28 @@ def main(
     try:
         proceso_obj.info(pausa=True, grupo_comunes=grupo_comunes)
         _record_successful_use_and_maybe_show_cta()
+        _recordar_sage50bi()
+        _recordar_ayuda()
         _pausa_final()
     except Exception as exc:
         logging.error(exc)
         rprint(f"[bold red]Error durante el proceso:[/bold red] {exc}")
         raise typer.Exit(1)
+
+
+@app.command("manual")
+def manual_cmd() -> None:
+    """Abre el manual que proporciona la licencia en el navegador."""
+    _abrir_manual()
+    rprint(f"[grey70]Manual: {MANUAL_URL}[/grey70]")
+    _recordar_ayuda()
+
+
+@app.command("version")
+def version_cmd() -> None:
+    """Muestra la versión del programa."""
+    rprint(f"s50info v{S50INFO_VERSION}")
+    _recordar_ayuda()
 
 
 @app.command("info")
@@ -310,6 +385,8 @@ def info_cmd(
         raise typer.Exit()
     proceso_obj.info(pausa=True, grupo_comunes=grupo_comunes)
     _record_successful_use_and_maybe_show_cta()
+    _recordar_sage50bi()
+    _recordar_ayuda()
     _pausa_final()
 
 
@@ -411,7 +488,7 @@ def export_cmd(
         "+",
         "--sqlyear",
         "-a",
-        help="Año o lista de años SQL a usar (ej: +, *, @, 2025JX, 2024JX,2025JX)",
+        help="Año o lista de años SQL a usar (ej: +, *, @, 2025, 2024,2025). El sufijo de letras se resuelve según el grupo de comunes.",
     ),
     grupo_comunes: str | None = typer.Option(
         None,
@@ -482,13 +559,13 @@ def run_cmd(
 
     if ruta is None or not ruta.strip():
         ruta = "script"
-        rprint("[dim]No se indicó ruta. Se intentará usar `script` automáticamente.[/dim]")
+        rprint("[grey70]No se indicó ruta. Se intentará usar `script` automáticamente.[/grey70]")
 
     path = Path(ruta.strip())
     if not path.exists():
         rprint(f"[bold red]Error:[/bold red] No se encontró: '{ruta}'")
-        rprint("[dim]Recomendación:[/dim] usa la carpeta `script` para automatizar este comando.")
-        rprint(f"[dim]Buscando en:[/dim] {path.resolve()}")
+        rprint("[grey70]Recomendación:[/grey70] usa la carpeta `script` para automatizar este comando.")
+        rprint(f"[grey70]Buscando en:[/grey70] {path.resolve()}")
         raise typer.Exit(1)
 
     if skip_polars_cpu_check:
@@ -568,5 +645,20 @@ def reset_cmd():
     proceso_obj.reset_log()
 
 
+def _cli_main() -> None:
+    """Punto de entrada: ante un error de uso muestra el recordatorio de ayuda."""
+    try:
+        app(standalone_mode=False)
+    except click.exceptions.UsageError as exc:
+        exc.show()
+        _recordar_ayuda()
+        raise SystemExit(exc.exit_code)
+    except click.exceptions.Exit as exc:
+        raise SystemExit(exc.exit_code)
+    except click.exceptions.Abort:
+        rprint("[red]Cancelado.[/red]")
+        raise SystemExit(1)
+
+
 if __name__ == "__main__":
-    app()
+    _cli_main()

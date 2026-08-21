@@ -26,7 +26,11 @@ def _appdata_con_terminal_valido(tmp_path, monkeypatch):
 
 
 def load_s50info_module(disable_usage_prompt=True):
-    """Importa s50info con dependencias externas mockeadas."""
+    """Importa s50info con dependencias externas mockeadas.
+
+    Restaura `sys.modules` tras el import para no contaminar a otros
+    módulos de test (p. ej. los `@patch("s50proceso.*")` de test_proceso).
+    """
     fake_pysage50e = ModuleType("pysage50e")
     fake_sage_debug_config = ModuleType("pysage50e.sage_debug_config")
     fake_proceso_module = MagicMock()
@@ -40,13 +44,31 @@ def load_s50info_module(disable_usage_prompt=True):
     mock_proceso_instance = MagicMock()
     fake_proceso_module.proceso.return_value = mock_proceso_instance
 
-    sys.modules.pop("s50info", None)
-    sys.modules.pop("polars", None)
+    mocked = {
+        "s50info": sys.modules.pop("s50info", None),
+        "polars": sys.modules.pop("polars", None),
+        "pysage50e": sys.modules.get("pysage50e"),
+        "pysage50e.sage_debug_config": sys.modules.get("pysage50e.sage_debug_config"),
+        "s50proceso": sys.modules.get("s50proceso"),
+        "s50onboarding": sys.modules.get("s50onboarding"),
+        "s50store": sys.modules.get("s50store"),
+    }
     sys.modules["pysage50e"] = fake_pysage50e
     sys.modules["pysage50e.sage_debug_config"] = fake_sage_debug_config
     sys.modules["s50proceso"] = fake_proceso_module
-    module = importlib.import_module("s50info")
+    sys.modules["s50onboarding"] = MagicMock()
+    sys.modules["s50store"] = MagicMock()
+    try:
+        module = importlib.import_module("s50info")
+    finally:
+        for name, original in mocked.items():
+            if original is None:
+                sys.modules.pop(name, None)
+            else:
+                sys.modules[name] = original
     module.rprint = MagicMock(side_effect=print)
+    module.s50onboarding.mostrar_if_necesario = MagicMock()
+    module.s50store.puerta_update_obligatorio = MagicMock(return_value=False)
     module.Panel = MagicMock()
     module._pausa_final = MagicMock()
     if disable_usage_prompt:
@@ -399,6 +421,133 @@ def test_reset_command_calls_reset_log():
 
     assert result.exit_code == 0
     mock_proceso_module.proceso.return_value.reset_log.assert_called_once_with()
+
+
+def test_version_flag_shows_program_version():
+    module, _, mock_proceso_module, _ = load_s50info_module()
+
+    result = runner.invoke(module.app, ["--v"])
+
+    assert result.exit_code == 0
+    assert f"s50info v{module.S50INFO_VERSION}" in result.stdout
+    assert "lista de comandos" in result.stdout
+    mock_proceso_module.proceso.assert_not_called()
+
+
+def test_version_command_and_short_flag_show_version():
+    module, _, _, _ = load_s50info_module()
+
+    for argv in (["version"], ["-v"]):
+        result = runner.invoke(module.app, argv)
+
+        assert result.exit_code == 0
+        assert f"s50info v{module.S50INFO_VERSION}" in result.stdout
+        assert "lista de comandos" in result.stdout
+
+
+def test_manual_flag_opens_license_manual(monkeypatch):
+    module, _, mock_proceso_module, _ = load_s50info_module()
+    abrir = MagicMock()
+    monkeypatch.setattr(module, "_abrir_manual", abrir)
+
+    result = runner.invoke(module.app, ["--m"])
+
+    assert result.exit_code == 0
+    abrir.assert_called_once_with()
+    assert module.MANUAL_URL in result.stdout
+    assert "lista de comandos" in result.stdout
+    mock_proceso_module.proceso.assert_not_called()
+
+
+def test_manual_command_opens_license_manual(monkeypatch):
+    module, _, _, _ = load_s50info_module()
+    abrir = MagicMock()
+    monkeypatch.setattr(module, "_abrir_manual", abrir)
+
+    result = runner.invoke(module.app, ["manual"])
+
+    assert result.exit_code == 0
+    abrir.assert_called_once_with()
+    assert module.MANUAL_URL in result.stdout
+
+
+def _panel_passthrough(*args, **kwargs):
+    return " ".join(str(a) for a in args)
+
+
+def test_default_flow_reminds_sage50bi_and_help(monkeypatch):
+    module, _, _, _ = load_s50info_module()
+    monkeypatch.setattr(module, "Panel", _panel_passthrough)
+
+    result = runner.invoke(module.app, [])
+
+    assert result.exit_code == 0
+    assert "Sage50BI" in result.stdout
+    assert "otro producto" in result.stdout
+    assert module.SAGE50BI_URL in result.stdout
+    assert "lista de comandos" in result.stdout
+
+
+def test_info_command_reminds_help(monkeypatch):
+    module, _, _, _ = load_s50info_module()
+    monkeypatch.setattr(module, "Panel", _panel_passthrough)
+
+    result = runner.invoke(module.app, ["info"])
+
+    assert result.exit_code == 0
+    assert "Sage50BI" in result.stdout
+    assert "otro producto" in result.stdout
+    assert "lista de comandos" in result.stdout
+
+
+def test_unknown_command_shows_reminder_and_help_hint(monkeypatch, capsys):
+    module, _, _, _ = load_s50info_module()
+    monkeypatch.setattr(sys, "argv", ["s50info", "comando_inexistente"])
+
+    with pytest.raises(SystemExit) as exc_info:
+        module._cli_main()
+
+    assert exc_info.value.code == 2
+    captured = capsys.readouterr()
+    assert "No such command" in captured.err
+    # En un error de uso no se promociona Sage50BI: solo el hint de ayuda.
+    assert "lista de comandos" in captured.out
+    assert "Sage50BI" not in captured.out
+
+
+def test_invalid_option_shows_reminder_and_help_hint(monkeypatch, capsys):
+    module, _, _, _ = load_s50info_module()
+    monkeypatch.setattr(sys, "argv", ["s50info", "sql", "--flag_inexistente"])
+
+    with pytest.raises(SystemExit) as exc_info:
+        module._cli_main()
+
+    assert exc_info.value.code == 2
+    captured = capsys.readouterr()
+    assert "Error" in captured.err
+    assert "lista de comandos" in captured.out
+
+
+def test_store_update_gate_blocks_before_subcommand():
+    module, _, mock_proceso_module, _ = load_s50info_module()
+    puerta = MagicMock(return_value=True)
+    module.s50store.puerta_update_obligatorio = puerta
+
+    result = runner.invoke(module.app, ["sql", "SELECT 1"])
+
+    assert result.exit_code == 1
+    puerta.assert_called_once_with(nombre_app="s50info")
+    mock_proceso_module.proceso.assert_not_called()
+
+
+def test_store_update_gate_passes_when_no_update():
+    module, _, mock_proceso_module, _ = load_s50info_module()
+
+    result = runner.invoke(module.app, ["info"])
+
+    assert result.exit_code == 0
+    module.s50store.puerta_update_obligatorio.assert_called_once()
+    mock_proceso_module.proceso.return_value.info.assert_called_once()
 
 
 def test_missing_sage_terminal_has_product_facing_message(tmp_path):
