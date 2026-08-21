@@ -488,32 +488,12 @@ def create_zip_archive(source_path: Path) -> Path:
 
 
 def sync_release_manifest_for_zip(info: ProductInfo, zip_path: Path) -> None:
-    RELEASE_MANIFEST_FILE.parent.mkdir(parents=True, exist_ok=True)
+    """Desactivado: la distribucion es exclusivamente Microsoft Store (MSIX).
 
-    release_data: dict[str, str] = {}
-    if RELEASE_MANIFEST_FILE.exists():
-        try:
-            existing = json.loads(RELEASE_MANIFEST_FILE.read_text(encoding="utf-8"))
-            if isinstance(existing, dict):
-                release_data = {str(k): v for k, v in existing.items()}
-        except json.JSONDecodeError as exc:
-            raise SystemExit(f"JSON invalido en {RELEASE_MANIFEST_FILE}: {exc}") from exc
-
-    release_data["version"] = info.version
-    release_data["zip"] = zip_path.name
-    version_parts = parse_version_parts(info.version)
-    is_major_base_release = version_parts[1] == 0 and version_parts[2] == 0 and version_parts[3] == 0
-    if is_major_base_release:
-        release_data["type"] = "full"
-    else:
-        release_data.pop("type", None)
-    release_data.setdefault("notes", "")
-
-    RELEASE_MANIFEST_FILE.write_text(
-        json.dumps(release_data, indent=4, ensure_ascii=False) + "\n",
-        encoding="utf-8",
-    )
-    print(f"[build] release.json actualizado: {RELEASE_MANIFEST_FILE}")
+    El updater ZIP/GitHub (release.py + release.json + manifest firmado)
+    se retiro; sus ficheros legacy viven en c/RELEASE/_delete/.
+    """
+    print("[build] release.json legacy desactivado (distribucion por Microsoft Store)")
 
 
 def resolve_public_assets_dir() -> Path | None:
