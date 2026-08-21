@@ -536,7 +536,9 @@ def test_store_update_gate_blocks_before_subcommand():
     result = runner.invoke(module.app, ["sql", "SELECT 1"])
 
     assert result.exit_code == 1
-    puerta.assert_called_once_with(nombre_app="s50info")
+    puerta.assert_called_once_with(
+        nombre_app="s50info", store_product_id=module.STORE_PRODUCT_ID
+    )
     mock_proceso_module.proceso.assert_not_called()
 
 

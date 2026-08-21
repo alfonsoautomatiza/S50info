@@ -56,6 +56,7 @@ class ProductInfo:
     original_filename: str
     product_display_name: str
     legal_copyright: str
+    store_product_id: str = ""
 
 
 @dataclass(frozen=True)
@@ -160,6 +161,7 @@ def load_product_info() -> ProductInfo:
         original_filename=original_filename,
         product_display_name=product_display_name,
         legal_copyright=required["legal_copyright"],
+        store_product_id=product_text(data, "store_product_id") or "",
     )
 
 
@@ -393,6 +395,7 @@ def render_version_module(info: ProductInfo) -> str:
         "Generado por c/build_exe.py desde c/product.json. No editar a mano.\n"
         '"""\n'
         f'__version__ = "{info.version}"\n'
+        f'STORE_PRODUCT_ID = "{info.store_product_id}"\n'
     )
 
 

@@ -20,6 +20,7 @@ import s50setup
 import s50onboarding
 import s50store
 from s50version import __version__ as S50INFO_VERSION
+from s50version import STORE_PRODUCT_ID
 
 try:
     import s50proceso
@@ -330,7 +331,9 @@ def main(
         raise typer.Exit()
 
     # Puerta de actualización obligatoria (solo instalaciones MSIX/Store).
-    if s50store.puerta_update_obligatorio(nombre_app="s50info"):
+    if s50store.puerta_update_obligatorio(
+        nombre_app="s50info", store_product_id=STORE_PRODUCT_ID
+    ):
         raise typer.Exit(1)
 
     _inicializar_directorio_trabajo()

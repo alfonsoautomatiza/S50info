@@ -6,102 +6,86 @@ fichero al raíz de tu proyecto y llámalo desde tu punto de entrada:
 
     import s50store
 
-    if s50store.puerta_update_obligatorio(nombre_app="miapp"):
+    if s50store.puerta_update_obligatorio(
+        nombre_app="miapp", store_product_id="9NXXXXXXXXXXXX"
+    ):
         raise SystemExit(1)  # el cliente debe actualizar en la Store y relanzar
 
-Requisitos: la app debe distribuirse como MSIX (Microsoft Store). En
-instalaciones sin identidad de paquete (ZIP, instalador clásico) la puerta
-no actúa. Politica fail-open: unicamente un ``True`` definitivo de la Store
-bloquea; timeout, sin red o error dejan continuar al cliente.
+Cómo decide: compara la versión publicada en el catálogo público de la Store
+(DisplayCatalog, el mismo que usa winget) con la versión instalada del
+paquete MSIX. Requisitos: distribución MSIX; en instalaciones sin identidad
+de paquete (ZIP, instalador clásico) la puerta no actúa.
+
+Política fail-open: únicamente un ``True`` definitivo bloquea — sin red,
+timeout, catálogo caído o versiones ilegibles dejan continuar al cliente.
 """
 
+import json
 import logging
 import re
-import subprocess
 import sys
+import urllib.error
+from urllib import request as urlrequest
 
 _logger = logging.getLogger(__name__)
 
 STORE_UPDATES_URI = "ms-windows-store://downloadsandupdates"
+DISPLAYCATALOG_URL = "https://displaycatalog.mp.microsoft.com/v7.0/products"
 
-_FAMILY_VALIDA = re.compile(r"^[A-Za-z0-9_.\-]+$")
-
-# PowerShell 5.1 (powershell.exe, nunca pwsh: PowerShell 7 no expone WinRT).
-# Consulta a la Store: GetIsAppUpdateAvailableAsync recibe el package family
-# name y devuelve IAsyncOperation[bool]. El baile de AsTask convierte la
-# operacion WinRT a Task para poder esperarla con timeout.
-_CONSULTA_PS = """
-$ErrorActionPreference = 'Stop'
-try {
-  Add-Type -AssemblyName System.Runtime.WindowsRuntime
-  $null = [Windows.ApplicationModel.Store.Preview.InstallControl.AppInstallManager,Windows.ApplicationModel.Store.Preview.InstallControl,ContentType=WindowsRuntime]
-  $mgr = New-Object Windows.ApplicationModel.Store.Preview.InstallControl.AppInstallManager
-  $op = $mgr.GetIsAppUpdateAvailableAsync('__FAMILY__')
-  $asTask = ([System.WindowsRuntimeSystemExtensions].GetMethods() | Where-Object {
-    $_.Name -eq 'AsTask' -and $_.GetParameters().Count -eq 1 -and
-    $_.GetParameters()[0].ParameterType.Name -eq 'IAsyncOperation`1'
-  } | Select-Object -First 1)
-  $task = $asTask.MakeGenericMethod([bool]).Invoke($null, @($op))
-  if ($task.Wait(15000)) { Write-Output $task.Result } else { Write-Output 'Timeout' }
-} catch {
-  Write-Output 'Error'
-}
-"""
+_VERSION_EN_FULL_NAME = re.compile(r"_([0-9]+(?:\.[0-9]+)+)_")
+_MARKUP = re.compile(r"\[/?[^\]]+\]")
 
 
-def package_family_name() -> str | None:
-    """Family name del paquete Store, o None si no hay identidad de paquete."""
+def package_full_name() -> str | None:
+    """PackageFullName del paquete Store, o None si no hay identidad."""
     if sys.platform != "win32":
         return None
     import ctypes
 
     kernel32 = ctypes.windll.kernel32
     size = ctypes.c_uint32(0)
-    rc = kernel32.GetCurrentPackageFamilyName(ctypes.byref(size), None)
-    if rc == 15700:  # APPMODEL_ERROR_NO_PACKAGE: instalacion no MSIX
+    rc = kernel32.GetCurrentPackageFullName(ctypes.byref(size), None)
+    if rc == 15700:  # APPMODEL_ERROR_NO_PACKAGE: instalación no MSIX
         return None
     if rc != 122:  # ERROR_INSUFFICIENT_BUFFER esperado en el primer paso
         return None
     buffer = ctypes.create_unicode_buffer(size.value)
-    rc = kernel32.GetCurrentPackageFamilyName(ctypes.byref(size), buffer)
+    rc = kernel32.GetCurrentPackageFullName(ctypes.byref(size), buffer)
     return buffer.value if rc == 0 and buffer.value else None
 
 
-def actualizacion_disponible(family_name: str | None = None) -> bool | None:
-    """True/False segun la Store; None si no se pudo consultar (fail-open)."""
-    family_name = family_name or package_family_name()
-    if not family_name or not _FAMILY_VALIDA.match(family_name):
+def version_de_full_name(full_name: str) -> tuple[int, ...] | None:
+    """Extrae la versión de un PackageFullName tipo app_2.2.1.0_arch__hash."""
+    match = _VERSION_EN_FULL_NAME.search(full_name or "")
+    if not match:
         return None
     try:
-        resultado = subprocess.run(
-            [
-                "powershell.exe",
-                "-NoProfile",
-                "-NonInteractive",
-                "-ExecutionPolicy",
-                "Bypass",
-                "-Command",
-                _CONSULTA_PS.replace("__FAMILY__", family_name),
-            ],
-            capture_output=True,
-            text=True,
-            timeout=25,
-            creationflags=0x08000000 if sys.platform == "win32" else 0,
-        )
-    except (OSError, subprocess.TimeoutExpired, ValueError) as exc:
-        _logger.info("store: consulta no disponible: %s", exc)
+        return tuple(int(parte) for parte in match.group(1).split("."))
+    except ValueError:
         return None
-    salida = (resultado.stdout or "").strip()
-    if resultado.returncode == 0 and salida == "True":
-        return True
-    if resultado.returncode == 0 and salida == "False":
-        return False
-    _logger.info(
-        "store: respuesta no concluyente (rc=%s, out=%r)",
-        resultado.returncode,
-        salida[:80],
-    )
-    return None
+
+
+def version_tienda(product_id: str, timeout: float = 8.0) -> tuple[int, ...] | None:
+    """Versión publicada en la Store para product_id (9N...); None si falla."""
+    if not product_id:
+        return None
+    url = f"{DISPLAYCATALOG_URL}?bigIds={product_id}&market=ES&languages=es-es"
+    try:
+        peticion = urlrequest.Request(url, headers={"Accept": "application/json"})
+        with urlrequest.urlopen(peticion, timeout=timeout) as respuesta:
+            datos = json.loads(respuesta.read())
+    except (OSError, urllib.error.URLError, ValueError) as exc:
+        _logger.info("store: DisplayCatalog no disponible: %s", exc)
+        return None
+
+    versiones = []
+    for producto in datos.get("Products", []):
+        for sku in producto.get("DisplaySkuAvailabilities", []):
+            for paquete in sku.get("Sku", {}).get("Properties", {}).get("Packages", []):
+                version = version_de_full_name(paquete.get("PackageFullName", ""))
+                if version:
+                    versiones.append(version)
+    return max(versiones) if versiones else None
 
 
 def abrir_tienda(uri: str = STORE_UPDATES_URI) -> None:
@@ -112,12 +96,12 @@ def abrir_tienda(uri: str = STORE_UPDATES_URI) -> None:
             startfile(uri)
             return
         except OSError:
-            _logger.warning("store: os.startfile fallo para %s; pruebo webbrowser", uri)
+            _logger.warning("store: os.startfile falló para %s; pruebo webbrowser", uri)
     import webbrowser
 
     try:
         webbrowser.open(uri)
-    except Exception as exc:  # noqa: BLE001 - webbrowser.Error varia por plataforma
+    except Exception as exc:  # noqa: BLE001 - webbrowser.Error varía por plataforma
         _logger.warning("store: no se pudo abrir %s: %s", uri, exc)
 
 
@@ -127,22 +111,24 @@ def _imprimir(texto: str) -> None:
 
         rprint(texto)
     except ImportError:
-        import re as _re
-
-        print(_re.sub(r"\[/?[^\]]+\]", "", texto))
+        print(_MARKUP.sub("", texto))
 
 
-def puerta_update_obligatorio(nombre_app: str | None = None) -> bool:
-    """Puerta de actualizacion obligatoria. True = bloquear y salir.
+def puerta_update_obligatorio(nombre_app: str | None = None, store_product_id: str | None = None) -> bool:
+    """Puerta de actualización obligatoria. True = bloquear y salir.
 
-    Solo bloquea ante un ``True`` definitivo de la Store (fail-open en todo
-    lo demas). Al bloquear ya ha impreso el aviso y abierto la ventana de
-    actualizaciones de la Store; el llamador debe terminar el proceso.
+    Compara la versión publicada en la Store (DisplayCatalog) con la
+    instalada. Solo bloquea si la de la Store es estrictamente mayor
+    (fail-open en todo lo demás). Al bloquear ya ha impreso el aviso y
+    abierto la ventana de actualizaciones; el llamador debe terminar.
     """
-    family = package_family_name()
-    if not family:
+    if not store_product_id:
         return False
-    if actualizacion_disponible(family) is not True:
+    instalada = version_de_full_name(package_full_name() or "")
+    if instalada is None:
+        return False
+    tienda = version_tienda(store_product_id)
+    if tienda is None or tienda <= instalada:
         return False
 
     app = nombre_app or "la aplicación"
