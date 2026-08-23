@@ -23,6 +23,7 @@ timeout, catálogo caído o versiones ilegibles dejan continuar al cliente.
 import json
 import logging
 import re
+import subprocess
 import sys
 import urllib.error
 from urllib import request as urlrequest
@@ -34,6 +35,68 @@ DISPLAYCATALOG_URL = "https://displaycatalog.mp.microsoft.com/v7.0/products"
 
 _VERSION_EN_FULL_NAME = re.compile(r"_([0-9]+(?:\.[0-9]+)+)_")
 _MARKUP = re.compile(r"\[/?[^\]]+\]")
+_FAMILY_VALIDA = re.compile(r"^[A-Za-z0-9_.\-]+$")
+
+# PowerShell 5.1 (powershell.exe, nunca pwsh: PowerShell 7 no expone WinRT).
+# Instalación silenciosa: UpdateAppByPackageFamilyNameAsync dispara el update
+# del paquete y devuelve un AppInstallItem cuyo estado se sondea hasta que
+# completa o se agota la espera. Verificado sin E_ACCESSDENIED bajo identidad
+# de paquete (a diferencia de SearchForAllUpdatesAsync).
+_DISPARO_PS = """
+$ErrorActionPreference = 'Stop'
+try {
+  Add-Type -AssemblyName System.Runtime.WindowsRuntime
+  $null = [Windows.ApplicationModel.Store.Preview.InstallControl.AppInstallItem,Windows.ApplicationModel.Store.Preview.InstallControl,ContentType=WindowsRuntime]
+  $null = [Windows.ApplicationModel.Store.Preview.InstallControl.AppInstallManager,Windows.ApplicationModel.Store.Preview.InstallControl,ContentType=WindowsRuntime]
+  $mgr = New-Object Windows.ApplicationModel.Store.Preview.InstallControl.AppInstallManager
+  $asTaskGeneric = ([System.WindowsRuntimeSystemExtensions].GetMethods() | Where-Object {
+    $_.Name -eq 'AsTask' -and $_.GetParameters().Count -eq 1 -and
+    $_.GetParameters()[0].ParameterType.Name -eq 'IAsyncOperation`1'
+  } | Select-Object -First 1)
+  $mi = [Windows.ApplicationModel.Store.Preview.InstallControl.AppInstallManager].GetMethods() |
+    Where-Object { $_.Name -eq 'UpdateAppByPackageFamilyNameAsync' } | Select-Object -First 1
+  $elem = $mi.ReturnType.GetGenericArguments()[0]
+  $op = $mgr.UpdateAppByPackageFamilyNameAsync('__FAMILY__')
+  $task = $asTaskGeneric.MakeGenericMethod($elem).Invoke($null, @($op))
+  if (-not $task.Wait(20000)) { Write-Output 'Timeout'; exit }
+  $item = $task.Result
+  if ($null -eq $item) { Write-Output 'SIN_UPDATE'; exit }
+  $limite = (Get-Date).AddSeconds(__WAIT__)
+  while ((Get-Date) -lt $limite) {
+    $estado = $item.GetCurrentStatus().InstallState.ToString()
+    if ($estado -eq 'Completed') { Write-Output 'COMPLETADA'; exit }
+    if ($estado -eq 'Error') { Write-Output 'ERROR_ESTADO'; exit }
+    Start-Sleep -Seconds 2
+  }
+  Write-Output 'EN_CURSO'
+} catch {
+  Write-Output 'Error'
+}
+"""
+
+
+def _ejecutar_ps(script: str, timeout: float):
+    """Ejecuta un script PowerShell y devuelve (rc, salida); None si no corre."""
+    try:
+        resultado = subprocess.run(
+            [
+                "powershell.exe",
+                "-NoProfile",
+                "-NonInteractive",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-Command",
+                script,
+            ],
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+            creationflags=0x08000000 if sys.platform == "win32" else 0,
+        )
+    except (OSError, subprocess.TimeoutExpired, ValueError) as exc:
+        _logger.info("store: PowerShell no disponible: %s", exc)
+        return None
+    return resultado.returncode, (resultado.stdout or "").strip()
 
 
 def package_full_name() -> str | None:
@@ -65,6 +128,21 @@ def version_de_full_name(full_name: str) -> tuple[int, ...] | None:
         return None
 
 
+def family_de_full_name(full_name: str) -> str:
+    """Deriva el PackageFamilyName de un PackageFullName.
+
+    InfoMSD.s50info_2.2.1.0_neutral__xjc995t8xskrw ->
+    InfoMSD.s50info_xjc995t8xskrw
+    """
+    if "__" not in (full_name or ""):
+        return ""
+    prefijo, _, hash_publicador = full_name.partition("__")
+    nombre = prefijo.split("_")[0]
+    if not nombre or not hash_publicador:
+        return ""
+    return f"{nombre}_{hash_publicador}"
+
+
 def version_tienda(product_id: str, timeout: float = 8.0) -> tuple[int, ...] | None:
     """Versión publicada en la Store para product_id (9N...); None si falla."""
     if not product_id:
@@ -86,6 +164,28 @@ def version_tienda(product_id: str, timeout: float = 8.0) -> tuple[int, ...] | N
                 if version:
                     versiones.append(version)
     return max(versiones) if versiones else None
+
+
+def disparar_actualizacion_silenciosa(
+    family_name: str, timeout_espera: float = 90.0
+) -> str | None:
+    """Dispara la instalación silenciosa del update y espera acotadamente.
+
+    Devuelve 'completada', 'en_curso', 'sin_update' o None si algo falló.
+    """
+    if not family_name or not _FAMILY_VALIDA.match(family_name):
+        return None
+    script = _DISPARO_PS.replace("__FAMILY__", family_name).replace(
+        "__WAIT__", str(int(timeout_espera))
+    )
+    ejecucion = _ejecutar_ps(script, timeout=20 + timeout_espera + 10)
+    if ejecucion is None or ejecucion[0] != 0:
+        return None
+    return {
+        "COMPLETADA": "completada",
+        "EN_CURSO": "en_curso",
+        "SIN_UPDATE": "sin_update",
+    }.get(ejecucion[1])
 
 
 def abrir_tienda(uri: str = STORE_UPDATES_URI) -> None:
@@ -114,17 +214,25 @@ def _imprimir(texto: str) -> None:
         print(_MARKUP.sub("", texto))
 
 
-def puerta_update_obligatorio(nombre_app: str | None = None, store_product_id: str | None = None) -> bool:
-    """Puerta de actualización obligatoria. True = bloquear y salir.
+def puerta_update_obligatorio(
+    nombre_app: str | None = None,
+    store_product_id: str | None = None,
+    timeout_espera: float = 90.0,
+) -> bool:
+    """Puerta de actualización silenciosa-obligatoria. True = bloquear y salir.
 
-    Compara la versión publicada en la Store (DisplayCatalog) con la
-    instalada. Solo bloquea si la de la Store es estrictamente mayor
-    (fail-open en todo lo demás). Al bloquear ya ha impreso el aviso y
-    abierto la ventana de actualizaciones; el llamador debe terminar.
+    Flujo cuando la Store tiene versión estrictamente mayor que la instalada:
+    1. Dispara la instalación en segundo plano (sin abrir la Store).
+    2. Si completa dentro del timeout -> avisa y deja continuar ya actualizado.
+    3. Si sigue descargando -> bloquea pidiendo reintentar en un momento.
+    4. Si la Store aún no sirve la versión (rollout) o falla todo lo demás:
+       fail-open y no tira nunca al cliente; ante fallo de disparo abre la
+       ventana de actualizaciones como último recurso.
     """
     if not store_product_id:
         return False
-    instalada = version_de_full_name(package_full_name() or "")
+    full_name = package_full_name() or ""
+    instalada = version_de_full_name(full_name)
     if instalada is None:
         return False
     tienda = version_tienda(store_product_id)
@@ -132,6 +240,33 @@ def puerta_update_obligatorio(nombre_app: str | None = None, store_product_id: s
         return False
 
     app = nombre_app or "la aplicación"
+    version_nueva = ".".join(str(p) for p in tienda)
+    resultado = disparar_actualizacion_silenciosa(
+        family_de_full_name(full_name), timeout_espera
+    )
+
+    if resultado == "completada":
+        _imprimir(
+            f"[bold green]{app} se ha actualizado a la versión {version_nueva} "
+            "en segundo plano.[/bold green]"
+        )
+        return False
+    if resultado == "sin_update":
+        # Rollout: DisplayCatalog la anuncia pero la Store aún no la sirve.
+        _imprimir(
+            f"[grey70]Hay una versión nueva ({version_nueva}) que todavía no "
+            f"está disponible para tu equipo; continúa con la actual.[/grey70]"
+        )
+        return False
+    if resultado == "en_curso":
+        _imprimir(
+            f"[bold yellow]{app} se está actualizando a la versión {version_nueva} "
+            "en segundo plano.[/bold yellow]"
+        )
+        _imprimir("[yellow]Espera un momento y vuelve a ejecutar el programa.[/yellow]")
+        return True
+
+    # Último recurso: ventana de Descargas y actualizaciones.
     _imprimir(
         f"[bold yellow]Hay una actualización obligatoria de {app} disponible "
         "en Microsoft Store.[/bold yellow]"
