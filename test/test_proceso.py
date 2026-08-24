@@ -207,6 +207,24 @@ class TestInfo:
         assert "super-secret" not in output
 
     @patch("s50proceso.rprint")
+    def test_configuracion_activa_escapa_markup_del_valor(
+        self, mock_rprint, mock_api_with_config, monkeypatch
+    ):
+        """El valor dinámico pasa por el escape de markup rich antes de rprint."""
+        monkeypatch.setattr(
+            s50proceso, "_rich_escape", lambda texto: f"<ESC>{texto}</ESC>"
+        )
+        mock_api_with_config.confsage50.cvariables = {
+            "api#direccion_servidor": "[Microsoft][ODBC Driver 17]",
+        }
+        proc = proceso(api=mock_api_with_config)
+
+        proc._mostrar_configuracion_activa()
+
+        output = "\n".join(str(call.args[0]) for call in mock_rprint.call_args_list)
+        assert "<ESC>[Microsoft][ODBC Driver 17]</ESC>" in output
+
+    @patch("s50proceso.rprint")
     def test_configuracion_activa_enmascara_password_sage50(
         self, mock_rprint, mock_api_with_config
     ):
@@ -432,6 +450,45 @@ class TestSql:
         mock_api.execute_query.assert_not_called()
         print_calls = [str(call) for call in mock_print.call_args_list]
         assert any("Consulta no permitida" in call for call in print_calls)
+
+    @pytest.mark.parametrize(
+        "consulta",
+        [
+            "SELECT * INTO t FROM CLIENTES",
+            "select codigo into copia from clientes",
+            "WITH cte AS (SELECT 1 AS x) SELECT x INTO y FROM cte",
+            "SELECT * FROM /* into */ TEST; SELECT 1 INTO t FROM TEST",
+        ],
+    )
+    @patch("builtins.print")
+    def test_sql_rejects_select_into(self, mock_print, mock_api, consulta):
+        """SELECT ... INTO crea tablas: debe rechazarse como escritura."""
+        proc = proceso(api=mock_api)
+
+        proc.sql(consulta)
+
+        mock_api.build_query.assert_not_called()
+        mock_api.execute_query.assert_not_called()
+        print_calls = [str(call) for call in mock_print.call_args_list]
+        assert any("Consulta no permitida" in call for call in print_calls)
+
+    @pytest.mark.parametrize(
+        "consulta",
+        [
+            "SELECT 'drop into nothing' FROM TEST",
+            "SELECT INTO_X FROM TEST",
+            "SELECT * FROM TEST /* comentario into seguro */",
+        ],
+    )
+    @patch("builtins.print")
+    def test_sql_allows_into_no_relevante(self, mock_print, mock_api, consulta):
+        """'into' en string, identificador INTO_X o comentario no es escritura."""
+        proc = proceso(api=mock_api)
+
+        proc.sql(consulta)
+
+        mock_api.build_query.assert_called_once()
+        mock_api.execute_query.assert_called_once_with("SELECT * FROM TEST", commit=False)
 
     @patch("builtins.print")
     def test_sql_applies_grupo_comunes_override(self, mock_print, mock_api):

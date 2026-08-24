@@ -10,6 +10,13 @@ from pathlib import Path
 import libwertyconfig
 from rich import print as rprint
 
+try:
+    from rich.markup import escape as _rich_escape
+except Exception:  # rich ausente o mockeado: sin escape
+
+    def _rich_escape(texto):
+        return texto
+
 SAGE50BI_URL = os.getenv("SAGE50BI_URL", "https://www.alfonsoautomatiza.com/s50-bi")
 
 
@@ -601,7 +608,7 @@ class proceso:
         for clave in [*claves_ordenadas, *claves_restantes]:
             etiqueta = etiquetas.get(clave, clave)
             valor = "********" if "password" in clave.lower() else cvariables[clave]
-            rprint(f"[cyan]{etiqueta}[/cyan]: {valor}")
+            rprint(f"[cyan]{etiqueta}[/cyan]: {_rich_escape(str(valor))}")
 
     def info(self, pausa=True, grupo_comunes=None):
         self._resolver_contexto_consulta(sqlyear="*", grupo_comunes=grupo_comunes)
@@ -640,6 +647,10 @@ class proceso:
         sql_limpio = re.sub(r"^[\s(]+", "", sql_limpio)
         sql_upper = sql_limpio.upper().strip()
         if self._contiene_separador_sentencias(sql_limpio):
+            return False
+        # SELECT ... INTO crea tablas: prohibido aunque empiece por SELECT/WITH.
+        # _iter_sql_tokens salta strings y comentarios, y respeta límites de palabra.
+        if any(token.upper() == "INTO" for _, token, _ in self._iter_sql_tokens(sql_limpio)):
             return False
         if sql_upper.startswith("WITH"):
             return self._cte_termina_en_select(sql_limpio)
