@@ -1,6 +1,7 @@
 import importlib
 import json
 import os
+import stat
 import sys
 from types import ModuleType
 from unittest.mock import MagicMock
@@ -720,3 +721,192 @@ def test_export_plantilla_relative_resolves_against_original_cwd(tmp_path, monke
     assert result.exit_code == 0
     _, kwargs = mock_proceso_module.proceso.return_value.sql2doc.call_args
     assert kwargs["plantilla"] == str(origen / "plantilla.txt")
+
+
+# --- helpers para tests con proceso REAL (no mock) ------------------------
+
+
+def _importar_s50info_con_proceso_real():
+    """Importa s50info con el módulo proceso REAL (dependencias mockeadas).
+
+    Útil para tests que necesitan ejercitar la cadena de llamadas real:
+    info_cmd / export_cmd -> proceso.info / proceso.sql2doc ->
+    _resolver_contexto_consulta -> ValueError.
+    """
+    import importlib
+    import stat
+    import sys
+    from types import ModuleType
+    from unittest.mock import MagicMock, patch
+
+    # Mock de dependencias de s50proceso ANTES de importar
+    mock_libsage50 = MagicMock()
+    mock_libwertyconfig = MagicMock()
+    mock_docx = MagicMock()
+    mock_rich = MagicMock()
+    mock_webbrowser = MagicMock()
+    mock_libwertyconfig.x11.return_value = {"ok": True, "status": "valid", "data": {}, "demo": False}
+
+    with patch.dict(
+        "sys.modules",
+        {
+            "libsage50": mock_libsage50,
+            "libwertyconfig": mock_libwertyconfig,
+            "docx": mock_docx,
+            "rich": mock_rich,
+            "webbrowser": mock_webbrowser,
+        },
+    ):
+        import s50proceso
+
+    # patch.dict restaura sys.modules al salir; reinsertar s50proceso para que
+    # s50info lo encuentre al importarse sin re-ejecutar el import (que fallaría
+    # sin los mocks de libwertyconfig en sys.modules).
+    sys.modules["s50proceso"] = s50proceso
+
+    # Mock de dependencias de s50info
+    fake_pysage50e = ModuleType("pysage50e")
+    fake_sage_debug_config = ModuleType("pysage50e.sage_debug_config")
+    mock_api_instance = MagicMock()
+    mock_api_instance.lconecto = True
+    fake_pysage50e.apiSAGE50 = MagicMock(return_value=mock_api_instance)
+    fake_sage_debug_config.configure_debug_logging = MagicMock(return_value=False)
+    fake_sage_debug_config.is_debug_enabled = MagicMock(return_value=False)
+
+    mocked = {
+        "s50info": sys.modules.pop("s50info", None),
+        "polars": sys.modules.pop("polars", None),
+        "pysage50e": sys.modules.get("pysage50e"),
+        "pysage50e.sage_debug_config": sys.modules.get("pysage50e.sage_debug_config"),
+        "s50onboarding": sys.modules.get("s50onboarding"),
+        "s50store": sys.modules.get("s50store"),
+    }
+    sys.modules["pysage50e"] = fake_pysage50e
+    sys.modules["pysage50e.sage_debug_config"] = fake_sage_debug_config
+    sys.modules["s50onboarding"] = MagicMock()
+    sys.modules["s50store"] = MagicMock()
+    try:
+        module = importlib.import_module("s50info")
+    finally:
+        for name, original in mocked.items():
+            if original is None:
+                sys.modules.pop(name, None)
+            else:
+                sys.modules[name] = original
+
+    module.rprint = MagicMock(side_effect=print)
+    module.s50onboarding.mostrar_if_necesario = MagicMock()
+    module.s50store.puerta_update_obligatorio = MagicMock(return_value=False)
+    module.Panel = MagicMock()
+    module._pausa_final = MagicMock()
+    module._record_successful_use_and_maybe_show_cta = MagicMock()
+
+    return module, fake_pysage50e, mock_api_instance, s50proceso
+
+
+class _FakeStat:
+    """Stat falso para mockear Path.stat() en tests."""
+
+    def __init__(self, is_dir=False):
+        self.st_ctime = 0.0
+        self.st_mode = stat.S_IFDIR | 0o755 if is_dir else stat.S_IFREG | 0o644
+
+
+# --- propagación REAL de errores desde _resolver_contexto_consulta ---------
+
+
+def test_info_command_resolver_error_propaga_limpio(tmp_path, monkeypatch):
+    """info_cmd propaga ValueError de _resolver_contexto_consulta sin traceback."""
+    module, fake_pysage50e, mock_api_instance, s50proceso_mod = _importar_s50info_con_proceso_real()
+
+    # Configurar API para que _resolver_contexto_consulta falle
+    # Sin tbyear y con comunes -> obtiene year_letra_nombre_comunes -> devuelve None -> ValueError
+    mock_api_instance.tbyear = None
+    mock_api_instance.comunes = "COMU0001"
+    mock_api_instance.obtener_year_letra_nombre_comunes.return_value = None
+
+    # Crear proceso REAL con API mockeada
+    config_path = tmp_path / "config.ini"
+    config_path.write_text("", encoding="utf-8")
+
+    # Mock Path.exists y Path.stat globalmente para este test
+    # _inicializar_directorio_trabajo usa is_dir() -> stat() -> st_mode
+    import pathlib
+
+    original_exists = pathlib.Path.exists
+    original_stat = pathlib.Path.stat
+
+    def mock_exists(self):
+        return True
+
+    def mock_stat(self, *args, **kwargs):
+        # Directorio de trabajo de la app -> is_dir() = True
+        # config.ini -> is_dir() = False
+        return _FakeStat(is_dir="s50info" in str(self))
+
+    monkeypatch.setattr(pathlib.Path, "exists", mock_exists)
+    monkeypatch.setattr(pathlib.Path, "stat", mock_stat)
+    monkeypatch.setattr(s50proceso_mod, "ExportadorResultados", MagicMock())
+
+    # Parchear _crear_proceso para que use nuestro proceso real
+    def fake_crear_proceso():
+        return s50proceso_mod.proceso(
+            api=mock_api_instance,
+            config_path=config_path,
+            directorio_resultados=str(tmp_path / "resultados"),
+        )
+
+    monkeypatch.setattr(module, "_crear_proceso", fake_crear_proceso)
+
+    result = runner.invoke(module.app, ["info"])
+
+    assert result.exit_code == 1
+    assert "Error durante el proceso" in result.stdout
+    assert "No se pudieron resolver años" in result.stdout
+    assert "Traceback" not in result.stdout
+    module._record_successful_use_and_maybe_show_cta.assert_not_called()
+
+
+def test_export_command_resolver_error_propaga_limpio(tmp_path, monkeypatch):
+    """export_cmd propaga ValueError de _resolver_contexto_consulta sin traceback (no mock sql2doc)."""
+    module, fake_pysage50e, mock_api_instance, s50proceso_mod = _importar_s50info_con_proceso_real()
+
+    # Configurar API para que _resolver_contexto_consulta falle
+    mock_api_instance.tbyear = None
+    mock_api_instance.comunes = "COMU0001"
+    mock_api_instance.obtener_year_letra_nombre_comunes.return_value = None
+
+    config_path = tmp_path / "config.ini"
+    config_path.write_text("", encoding="utf-8")
+
+    import pathlib
+
+    original_exists = pathlib.Path.exists
+    original_stat = pathlib.Path.stat
+
+    def mock_exists(self):
+        return True
+
+    def mock_stat(self, *args, **kwargs):
+        return _FakeStat(is_dir="s50info" in str(self))
+
+    monkeypatch.setattr(pathlib.Path, "exists", mock_exists)
+    monkeypatch.setattr(pathlib.Path, "stat", mock_stat)
+    monkeypatch.setattr(s50proceso_mod, "ExportadorResultados", MagicMock())
+
+    def fake_crear_proceso():
+        return s50proceso_mod.proceso(
+            api=mock_api_instance,
+            config_path=config_path,
+            directorio_resultados=str(tmp_path / "resultados"),
+        )
+
+    monkeypatch.setattr(module, "_crear_proceso", fake_crear_proceso)
+
+    result = runner.invoke(module.app, ["export", "SELECT * FROM TEST"])
+
+    assert result.exit_code == 1
+    assert "Error durante el proceso" in result.stdout
+    assert "No se pudieron resolver años" in result.stdout
+    assert "Traceback" not in result.stdout
+    module._record_successful_use_and_maybe_show_cta.assert_not_called()

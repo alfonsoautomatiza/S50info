@@ -149,6 +149,7 @@ def test_version_tienda_cuerpo_no_dict_fail_open(cuerpo, monkeypatch):
         {"Products": "no-lista"},
         {"Products": [{"DisplaySkuAvailabilities": "no-lista"}]},
         {"Products": [{"DisplaySkuAvailabilities": ["no-dict"]}]},
+        {"Products": [{"DisplaySkuAvailabilities": [{}]}]},  # dict vacío en DisplaySkuAvailabilities
         {"Products": [{"DisplaySkuAvailabilities": [{"Sku": "no-dict"}]}]},
         {"Products": [{"DisplaySkuAvailabilities": [{"Sku": {"Properties": "no-dict"}}]}]},
         {
