@@ -207,6 +207,24 @@ class TestInfo:
         assert "super-secret" not in output
 
     @patch("s50proceso.rprint")
+    def test_configuracion_activa_password_vacia_no_muestra_asteriscos(
+        self, mock_rprint, mock_api_with_config
+    ):
+        """Sin contraseña configurada no debe fingir que la hay con ********."""
+        mock_api_with_config.confsage50.cvariables = {
+            "api#nombre_usuario": "sa",
+            "api#password": "",
+        }
+        proc = proceso(api=mock_api_with_config)
+
+        proc._mostrar_configuracion_activa()
+
+        output = "\n".join(str(call.args[0]) for call in mock_rprint.call_args_list)
+        assert "Password SQL" in output
+        assert "********" not in output
+        assert "(sin definir)" in output
+
+    @patch("s50proceso.rprint")
     def test_configuracion_activa_escapa_markup_del_valor(
         self, mock_rprint, mock_api_with_config, monkeypatch
     ):

@@ -607,7 +607,11 @@ class proceso:
 
         for clave in [*claves_ordenadas, *claves_restantes]:
             etiqueta = etiquetas.get(clave, clave)
-            valor = "********" if "password" in clave.lower() else cvariables[clave]
+            if "password" in clave.lower():
+                # Solo enmascarar si hay contraseña; vacía no finge que exista.
+                valor = "********" if str(cvariables[clave] or "").strip() else "(sin definir)"
+            else:
+                valor = cvariables[clave]
             rprint(f"[cyan]{etiqueta}[/cyan]: {_rich_escape(str(valor))}")
 
     def info(self, pausa=True, grupo_comunes=None):
