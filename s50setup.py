@@ -21,6 +21,7 @@ import webbrowser
 from pathlib import Path
 
 from rich import print as rprint
+from rich.markup import escape
 from rich.panel import Panel
 from rich.prompt import Prompt
 
@@ -216,7 +217,7 @@ def construir_menu(candidatos: list[Path]) -> tuple[list[tuple[str, Path | None]
     numero = 1
     for terminal in candidatos:
         opciones.append(("usar", terminal))
-        lineas.append(f"  [{numero}] Usar SAGE 50 detectado en: [cyan]{terminal}[/cyan]")
+        lineas.append(f"  [{numero}] Usar SAGE 50 detectado en: [cyan]{escape(str(terminal))}[/cyan]")
         numero += 1
 
     opciones.append(("manual", None))

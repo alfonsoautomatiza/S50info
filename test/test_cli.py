@@ -25,7 +25,7 @@ def _appdata_con_terminal_valido(tmp_path, monkeypatch):
     return appdata
 
 
-def load_s50info_module(disable_usage_prompt=True):
+def load_s50info_module(disable_usage_prompt=True, mock_pausa=True):
     """Importa s50info con dependencias externas mockeadas.
 
     Restaura `sys.modules` tras el import para no contaminar a otros
@@ -70,7 +70,8 @@ def load_s50info_module(disable_usage_prompt=True):
     module.s50onboarding.mostrar_if_necesario = MagicMock()
     module.s50store.puerta_update_obligatorio = MagicMock(return_value=False)
     module.Panel = MagicMock()
-    module._pausa_final = MagicMock()
+    if mock_pausa:
+        module._pausa_final = MagicMock()
     if disable_usage_prompt:
         module._record_successful_use_and_maybe_show_cta = MagicMock()
 
@@ -597,3 +598,125 @@ def test_api_connection_failure_exits_cleanly(tmp_path):
         config_path=config_path,
         directorio_resultados=str(module._cwd_original / "resultados"),
     )
+
+
+# --- errores de proceso con mensaje limpio (sin traceback) ---------------
+
+
+def test_export_command_sql2doc_error_shows_clean_message():
+    module, _, mock_proceso_module, _ = load_s50info_module()
+    mock_proceso_module.proceso.return_value.sql2doc.side_effect = ValueError(
+        "No se encontraron años válidos"
+    )
+
+    result = runner.invoke(module.app, ["export", "SELECT * FROM TEST"])
+
+    assert result.exit_code == 1
+    assert "Error durante el proceso" in result.stdout
+    assert "No se encontraron años válidos" in result.stdout
+    assert "Traceback" not in result.stdout
+    module._record_successful_use_and_maybe_show_cta.assert_not_called()
+
+
+def test_info_command_error_shows_clean_message():
+    module, _, mock_proceso_module, _ = load_s50info_module()
+    mock_proceso_module.proceso.return_value.info.side_effect = ValueError("boom contexto")
+
+    result = runner.invoke(module.app, ["info"])
+
+    assert result.exit_code == 1
+    assert "Error durante el proceso" in result.stdout
+    assert "boom contexto" in result.stdout
+    assert "Traceback" not in result.stdout
+
+
+# --- _pausa_final con stdin no interactivo ------------------------------
+
+
+def test_pausa_final_tolera_stdin_no_interactivo(monkeypatch, capsys):
+    """input() lanza EOFError con stdin cerrado (tareas programadas/pipes)."""
+    module, _, _, _ = load_s50info_module(mock_pausa=False)
+
+    def stdin_cerrado(*args, **kwargs):
+        raise EOFError
+
+    monkeypatch.setattr("builtins.input", stdin_cerrado)
+
+    try:
+        module._pausa_final()
+    except EOFError:
+        pytest.fail("_pausa_final no debe propagar EOFError con stdin cerrado")
+
+    assert "Presione UNA tecla" in capsys.readouterr().out
+
+
+def test_pausa_final_tolera_ctrl_c(monkeypatch, capsys):
+    module, _, _, _ = load_s50info_module(mock_pausa=False)
+
+    def interrumpido(*args, **kwargs):
+        raise KeyboardInterrupt
+
+    monkeypatch.setattr("builtins.input", interrumpido)
+
+    try:
+        module._pausa_final()
+    except KeyboardInterrupt:
+        pytest.fail("_pausa_final no debe propagar KeyboardInterrupt")
+
+
+# --- escapado de markup rich en textos dinámicos ------------------------
+
+
+@pytest.mark.parametrize(
+    "texto_error",
+    [
+        "[Microsoft][ODBC Driver Manager] Invalid string",
+        "[/Microsoft][ODBC Driver Manager] Invalid string",
+    ],
+)
+def test_connection_error_escapes_rich_markup(texto_error):
+    """Los corchetes de errores ODBC no deben romper el markup de rich."""
+    from rich import print as rich_print
+
+    module, fake_pysage50e, _, _ = load_s50info_module()
+    module.rprint = rich_print  # markup activo, como en producción
+    fake_pysage50e.apiSAGE50.side_effect = ValueError(texto_error)
+
+    result = runner.invoke(module.app, ["sql", "SELECT 1"])
+
+    assert result.exit_code == 0
+    assert texto_error in result.stdout
+
+
+# --- rutas relativas del usuario contra el cwd original -----------------
+
+
+def test_run_command_relative_path_resolves_against_original_cwd(tmp_path, monkeypatch):
+    """`s50info run ./myscript.py` debe encontrar el script del usuario,
+    no resolverlo contra APPDATA (directorio de trabajo de la app)."""
+    module, _, _, _ = load_s50info_module()
+    origen = tmp_path / "proyecto"
+    origen.mkdir()
+    (origen / "myscript.py").write_text("print('desde cwd original')", encoding="utf-8")
+    monkeypatch.chdir(origen)
+
+    result = runner.invoke(module.app, ["run", "myscript.py"])
+
+    assert result.exit_code == 0
+    assert "desde cwd original" in result.stdout
+
+
+def test_export_plantilla_relative_resolves_against_original_cwd(tmp_path, monkeypatch):
+    module, _, mock_proceso_module, _ = load_s50info_module()
+    origen = tmp_path / "proyecto"
+    origen.mkdir()
+    (origen / "plantilla.txt").write_text("X", encoding="utf-8")
+    monkeypatch.chdir(origen)
+
+    result = runner.invoke(
+        module.app, ["export", "SELECT 1", "--plantilla", "plantilla.txt"]
+    )
+
+    assert result.exit_code == 0
+    _, kwargs = mock_proceso_module.proceso.return_value.sql2doc.call_args
+    assert kwargs["plantilla"] == str(origen / "plantilla.txt")

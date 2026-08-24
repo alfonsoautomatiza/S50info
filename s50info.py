@@ -14,6 +14,7 @@ import click
 from pysage50e import apiSAGE50
 from pysage50e.sage_debug_config import configure_debug_logging
 from rich import print as rprint
+from rich.markup import escape
 from rich.panel import Panel
 
 import s50setup
@@ -127,7 +128,7 @@ def _ejecutar_asistente_terminal(config_path) -> bool:
 
 def _crear_proceso():
     try:
-        rprint(f"[grey70]Directorio Config.ini: {_app_state_dir()}[/grey70]")
+        rprint(f"[grey70]Directorio Config.ini: {escape(str(_app_state_dir()))}[/grey70]")
         rprint("[grey70]Conectando a SAGE50...[/grey70]")
         config_path = _ensure_config_path()
         for intento in range(2):
@@ -156,7 +157,7 @@ def _crear_proceso():
             return None
         return None
     except Exception as exc:
-        rprint(f"[bold red]Error al conectar con SAGE50:[/bold red] {exc}")
+        rprint(f"[bold red]Error al conectar con SAGE50:[/bold red] {escape(str(exc))}")
         logging.error(f"Error conectando SAGE50: {exc}")
         return None
 
@@ -217,7 +218,11 @@ def _record_successful_use_and_maybe_show_cta(state_path: Path | None = None) ->
 
 def _pausa_final():
     rprint("\n[bold green]Presione UNA tecla para continuar...[/bold green]")
-    input()
+    try:
+        input()
+    except (EOFError, KeyboardInterrupt):
+        # stdin no interactivo (tareas programadas, pipes) o Ctrl+C: continuar.
+        pass
 
 
 def _inyectar_helpers_script(proceso_obj):
@@ -355,7 +360,7 @@ def main(
         _pausa_final()
     except Exception as exc:
         logging.error(exc)
-        rprint(f"[bold red]Error durante el proceso:[/bold red] {exc}")
+        rprint(f"[bold red]Error durante el proceso:[/bold red] {escape(str(exc))}")
         raise typer.Exit(1)
 
 
@@ -386,11 +391,16 @@ def info_cmd(
     proceso_obj = _crear_proceso()
     if proceso_obj is None:
         raise typer.Exit()
-    proceso_obj.info(pausa=True, grupo_comunes=grupo_comunes)
-    _record_successful_use_and_maybe_show_cta()
-    _recordar_sage50bi()
-    _recordar_ayuda()
-    _pausa_final()
+    try:
+        proceso_obj.info(pausa=True, grupo_comunes=grupo_comunes)
+        _record_successful_use_and_maybe_show_cta()
+        _recordar_sage50bi()
+        _recordar_ayuda()
+        _pausa_final()
+    except Exception as exc:
+        logging.error(exc)
+        rprint(f"[bold red]Error durante el proceso:[/bold red] {escape(str(exc))}")
+        raise typer.Exit(1)
 
 
 @app.command("sql", context_settings={"allow_extra_args": True, "ignore_unknown_options": False})
@@ -524,18 +534,26 @@ def export_cmd(
     if proceso_obj is None:
         raise typer.Exit()
     sqlyear = _normalizar_sqlyear_desde_shell(ctx, sqlyear)
+    if plantilla and not Path(plantilla).is_absolute():
+        # Ruta relativa del usuario: anclarla al cwd original, no a APPDATA.
+        plantilla = str(_cwd_original / plantilla)
     rprint(f"[bold cyan]Ejecutando SQL export a {formato}...[/bold cyan]")
-    success = proceso_obj.sql2doc(
-        query,
-        sqlyear=sqlyear,
-        grupo_comunes=grupo_comunes,
-        groupby=groupby,
-        sage50=sage50,
-        formato=formato,
-        nombre_archivo=output,
-        plantilla=plantilla,
-        comprimir=comprimir,
-    )
+    try:
+        success = proceso_obj.sql2doc(
+            query,
+            sqlyear=sqlyear,
+            grupo_comunes=grupo_comunes,
+            groupby=groupby,
+            sage50=sage50,
+            formato=formato,
+            nombre_archivo=output,
+            plantilla=plantilla,
+            comprimir=comprimir,
+        )
+    except Exception as exc:
+        logging.error(exc)
+        rprint(f"[bold red]Error durante el proceso:[/bold red] {escape(str(exc))}")
+        raise typer.Exit(1)
     if success is True:
         _record_successful_use_and_maybe_show_cta()
 
@@ -563,12 +581,17 @@ def run_cmd(
     if ruta is None or not ruta.strip():
         ruta = "script"
         rprint("[grey70]No se indicó ruta. Se intentará usar `script` automáticamente.[/grey70]")
+        path = Path(ruta)
+    else:
+        # Ruta relativa del usuario: anclarla al cwd original, no a APPDATA.
+        path = Path(ruta.strip())
+        if not path.is_absolute():
+            path = _cwd_original / path
 
-    path = Path(ruta.strip())
     if not path.exists():
-        rprint(f"[bold red]Error:[/bold red] No se encontró: '{ruta}'")
+        rprint(f"[bold red]Error:[/bold red] No se encontró: '{escape(ruta)}'")
         rprint("[grey70]Recomendación:[/grey70] usa la carpeta `script` para automatizar este comando.")
-        rprint(f"[grey70]Buscando en:[/grey70] {path.resolve()}")
+        rprint(f"[grey70]Buscando en:[/grey70] {escape(str(path.resolve()))}")
         raise typer.Exit(1)
 
     if skip_polars_cpu_check:
@@ -625,11 +648,11 @@ def run_cmd(
         helpers = _inyectar_helpers_script(proceso_obj)
         script_globals = {
             "__name__": "__main__",
-            "__file__": ruta,
+            "__file__": str(path),
             "proceso": proceso_obj,
             **helpers,
         }
-        runpy.run_path(ruta, init_globals=script_globals, run_name="__main__")
+        runpy.run_path(str(path), init_globals=script_globals, run_name="__main__")
         _record_successful_use_and_maybe_show_cta()
         _pausa_final()
     except Exception as exc:
