@@ -21,6 +21,7 @@ flatten = true
 env_var = "WERTY_LIBS_DIR"
 default_dir = "d:\\py\\@produxion\\@api\\mislibrerias"
 files = [
+    "libupdatemsix.py",
     "libwertyconfig.py",
     "libwertylog.py",
 ]

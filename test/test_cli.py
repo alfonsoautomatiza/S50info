@@ -52,13 +52,13 @@ def load_s50info_module(disable_usage_prompt=True, mock_pausa=True):
         "pysage50e.sage_debug_config": sys.modules.get("pysage50e.sage_debug_config"),
         "s50proceso": sys.modules.get("s50proceso"),
         "s50onboarding": sys.modules.get("s50onboarding"),
-        "s50store": sys.modules.get("s50store"),
+        "libupdatemsix": sys.modules.get("libupdatemsix"),
     }
     sys.modules["pysage50e"] = fake_pysage50e
     sys.modules["pysage50e.sage_debug_config"] = fake_sage_debug_config
     sys.modules["s50proceso"] = fake_proceso_module
     sys.modules["s50onboarding"] = MagicMock()
-    sys.modules["s50store"] = MagicMock()
+    sys.modules["libupdatemsix"] = MagicMock()
     try:
         module = importlib.import_module("s50info")
     finally:
@@ -69,7 +69,7 @@ def load_s50info_module(disable_usage_prompt=True, mock_pausa=True):
                 sys.modules[name] = original
     module.rprint = MagicMock(side_effect=print)
     module.s50onboarding.mostrar_if_necesario = MagicMock()
-    module.s50store.puerta_update_obligatorio = MagicMock(return_value=False)
+    module.libupdatemsix.puerta_update_obligatorio = MagicMock(return_value=False)
     module.Panel = MagicMock()
     if mock_pausa:
         module._pausa_final = MagicMock()
@@ -533,7 +533,7 @@ def test_invalid_option_shows_reminder_and_help_hint(monkeypatch, capsys):
 def test_store_update_gate_blocks_before_subcommand():
     module, _, mock_proceso_module, _ = load_s50info_module()
     puerta = MagicMock(return_value=True)
-    module.s50store.puerta_update_obligatorio = puerta
+    module.libupdatemsix.puerta_update_obligatorio = puerta
 
     result = runner.invoke(module.app, ["sql", "SELECT 1"])
 
@@ -550,7 +550,7 @@ def test_store_update_gate_passes_when_no_update():
     result = runner.invoke(module.app, ["info"])
 
     assert result.exit_code == 0
-    module.s50store.puerta_update_obligatorio.assert_called_once()
+    module.libupdatemsix.puerta_update_obligatorio.assert_called_once()
     mock_proceso_module.proceso.return_value.info.assert_called_once()
 
 
@@ -779,12 +779,12 @@ def _importar_s50info_con_proceso_real():
         "pysage50e": sys.modules.get("pysage50e"),
         "pysage50e.sage_debug_config": sys.modules.get("pysage50e.sage_debug_config"),
         "s50onboarding": sys.modules.get("s50onboarding"),
-        "s50store": sys.modules.get("s50store"),
+        "libupdatemsix": sys.modules.get("libupdatemsix"),
     }
     sys.modules["pysage50e"] = fake_pysage50e
     sys.modules["pysage50e.sage_debug_config"] = fake_sage_debug_config
     sys.modules["s50onboarding"] = MagicMock()
-    sys.modules["s50store"] = MagicMock()
+    sys.modules["libupdatemsix"] = MagicMock()
     try:
         module = importlib.import_module("s50info")
     finally:
@@ -796,7 +796,7 @@ def _importar_s50info_con_proceso_real():
 
     module.rprint = MagicMock(side_effect=print)
     module.s50onboarding.mostrar_if_necesario = MagicMock()
-    module.s50store.puerta_update_obligatorio = MagicMock(return_value=False)
+    module.libupdatemsix.puerta_update_obligatorio = MagicMock(return_value=False)
     module.Panel = MagicMock()
     module._pausa_final = MagicMock()
     module._record_successful_use_and_maybe_show_cta = MagicMock()

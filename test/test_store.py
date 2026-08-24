@@ -1,4 +1,7 @@
-"""Tests de s50store: puerta de actualización obligatoria vía DisplayCatalog."""
+"""Valida la librería compartida libupdatemsix consumida por s50info.
+
+Tests de la puerta de actualización obligatoria vía DisplayCatalog.
+"""
 
 import subprocess
 import sys
@@ -8,9 +11,12 @@ from unittest.mock import MagicMock
 
 import pytest
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+# Resolver directorio de la librería compartida y añadir a sys.path
+_lib_dir = Path(__file__).resolve().parents[3] / "@api" / "mislibrerias"
+if _lib_dir.is_dir():
+    sys.path.insert(0, str(_lib_dir))
 
-import s50store  # noqa: E402
+import libupdatemsix as s50store  # noqa: E402
 
 
 def _resultado(returncode=0, stdout=""):

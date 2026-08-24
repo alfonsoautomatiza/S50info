@@ -28,7 +28,7 @@
 - In `full`/`zip` modes, `.last_build` should be generated at the very end of the successful build flow.
 
 ## Release workflow
-- Distribution and updates are handled exclusively by Microsoft Store (Partner Center) via MSIX: the Store auto-updates clients, and `s50store.py` gates outdated ones.
+- Distribution and updates are handled exclusively by Microsoft Store (Partner Center) via MSIX: the Store auto-updates clients, and `libupdatemsix` gates outdated ones.
 - The legacy ZIP/GitHub updater (`release.py`, `release.json`, `README.md`, `.env`) was retired and moved to `c/RELEASE/_delete/`; do not use or resurrect it without explicit need.
 - Release documentation for the manual/novedades site lives in the docs repo (`docs_repo` in `c/product.json`).
 

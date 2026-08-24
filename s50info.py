@@ -19,9 +19,25 @@ from rich.panel import Panel
 
 import s50setup
 import s50onboarding
-import s50store
 from s50version import __version__ as S50INFO_VERSION
 from s50version import STORE_PRODUCT_ID
+
+# Carga resiliente de libupdatemsix (librería compartida en mislibrerias)
+try:
+    import libupdatemsix
+except ImportError:
+    for _libs in (
+        Path("d:/py/@produxion/@api/mislibrerias"),
+        Path("c:/py/@produxion/@api/mislibrerias"),
+    ):
+        if _libs.is_dir():
+            sys.path.insert(0, str(_libs))
+            break
+    try:
+        import libupdatemsix
+    except ImportError:
+        libupdatemsix = None
+        logging.warning("libupdatemsix no disponible: puerta de actualizacion desactivada")
 
 try:
     import s50proceso
@@ -336,7 +352,7 @@ def main(
         raise typer.Exit()
 
     # Puerta de actualización obligatoria (solo instalaciones MSIX/Store).
-    if s50store.puerta_update_obligatorio(
+    if libupdatemsix is not None and libupdatemsix.puerta_update_obligatorio(
         nombre_app="s50info", store_product_id=STORE_PRODUCT_ID
     ):
         raise typer.Exit(1)
