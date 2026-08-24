@@ -34,3 +34,4 @@ c/RELEASE/_internal/
 # Local tooling
 .codegraph/
 .licwerty/
+msix/s50info Installer.exe
