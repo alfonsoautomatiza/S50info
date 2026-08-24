@@ -124,6 +124,59 @@ def test_version_tienda_sin_productos_devuelve_none(monkeypatch):
     assert s50store.version_tienda("9N0000000000") is None
 
 
+@pytest.mark.parametrize(
+    "cuerpo",
+    [
+        b"null",
+        b"[]",
+        b'"texto"',
+        b"123",
+    ],
+)
+def test_version_tienda_cuerpo_no_dict_fail_open(cuerpo, monkeypatch):
+    """HTTP 200 con JSON no-dict no debe lanzar; devuelve None."""
+    urlopen = MagicMock(return_value=_respuesta_http(cuerpo))
+    monkeypatch.setattr(s50store.urlrequest, "urlopen", urlopen)
+
+    assert s50store.version_tienda("9N0000000000") is None
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {"Products": [{}]},  # producto sin claves esperadas
+        {"Products": ["x"]},  # entrada Products que no es dict
+        {"Products": "no-lista"},
+        {"Products": [{"DisplaySkuAvailabilities": "no-lista"}]},
+        {"Products": [{"DisplaySkuAvailabilities": ["no-dict"]}]},
+        {"Products": [{"DisplaySkuAvailabilities": [{"Sku": "no-dict"}]}]},
+        {"Products": [{"DisplaySkuAvailabilities": [{"Sku": {"Properties": "no-dict"}}]}]},
+        {
+            "Products": [
+                {"DisplaySkuAvailabilities": [{"Sku": {"Properties": {"Packages": "no-lista"}}}]}
+            ]
+        },
+        {
+            "Products": [
+                {
+                    "DisplaySkuAvailabilities": [
+                        {"Sku": {"Properties": {"Packages": ["no-dict"]}}}
+                    ]
+                }
+            ]
+        },
+    ],
+)
+def test_version_tienda_formas_malformadas_fail_open(payload, monkeypatch):
+    """Cualquier forma anidada inesperada devuelve None sin excepción."""
+    import json
+
+    urlopen = MagicMock(return_value=_respuesta_http(json.dumps(payload).encode()))
+    monkeypatch.setattr(s50store.urlrequest, "urlopen", urlopen)
+
+    assert s50store.version_tienda("9N0000000000") is None
+
+
 # --- instalación silenciosa ---------------------------------------------
 
 
@@ -215,16 +268,19 @@ def test_puerta_silenciosa_en_curso_bloquea_sin_abrir_tienda(monkeypatch, capsys
 
 
 def test_puerta_fallback_abre_tienda_si_silenciosa_falla(monkeypatch, capsys):
+    """Fallo del disparo: avisa, abre la Store y continúa (fail-open)."""
     abrir, _ = _instalar_escenario(
         monkeypatch, (2, 2, 1, 0), (2, 3, 0, 0), silenciosa=None
     )
 
     assert (
         s50store.puerta_update_obligatorio(nombre_app="s50info", store_product_id="9NX")
-        is True
+        is False
     )
     abrir.assert_called_once()
-    assert "obligatoria" in capsys.readouterr().out
+    salida = capsys.readouterr().out
+    assert "no se pudo actualizar" in salida
+    assert "No puedes continuar" not in salida
 
 
 def test_puerta_rollout_sin_update_en_tienda_deja_pasar(monkeypatch, capsys):

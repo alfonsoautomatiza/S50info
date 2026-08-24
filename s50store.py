@@ -156,10 +156,36 @@ def version_tienda(product_id: str, timeout: float = 8.0) -> tuple[int, ...] | N
         _logger.info("store: DisplayCatalog no disponible: %s", exc)
         return None
 
+    if not isinstance(datos, dict):
+        _logger.info("store: respuesta DisplayCatalog inesperada (no es objeto)")
+        return None
+
+    # Formas malformadas (tipos inesperados en cualquier nivel) -> fail-open.
     versiones = []
-    for producto in datos.get("Products", []):
-        for sku in producto.get("DisplaySkuAvailabilities", []):
-            for paquete in sku.get("Sku", {}).get("Properties", {}).get("Packages", []):
+    productos = datos.get("Products", [])
+    if not isinstance(productos, list):
+        return None
+    for producto in productos:
+        if not isinstance(producto, dict):
+            continue
+        skus = producto.get("DisplaySkuAvailabilities", [])
+        if not isinstance(skus, list):
+            continue
+        for sku in skus:
+            if not isinstance(sku, dict):
+                continue
+            sku_propio = sku.get("Sku")
+            if not isinstance(sku_propio, dict):
+                continue
+            propiedades = sku_propio.get("Properties")
+            if not isinstance(propiedades, dict):
+                continue
+            paquetes = propiedades.get("Packages", [])
+            if not isinstance(paquetes, list):
+                continue
+            for paquete in paquetes:
+                if not isinstance(paquete, dict):
+                    continue
                 version = version_de_full_name(paquete.get("PackageFullName", ""))
                 if version:
                     versiones.append(version)
@@ -225,9 +251,9 @@ def puerta_update_obligatorio(
     1. Dispara la instalación en segundo plano (sin abrir la Store).
     2. Si completa dentro del timeout -> avisa y deja continuar ya actualizado.
     3. Si sigue descargando -> bloquea pidiendo reintentar en un momento.
-    4. Si la Store aún no sirve la versión (rollout) o falla todo lo demás:
-       fail-open y no tira nunca al cliente; ante fallo de disparo abre la
-       ventana de actualizaciones como último recurso.
+    4. Si la Store aún no sirve la versión (rollout) o falla el disparo:
+       avisa, abre la ventana de actualizaciones y continúa (fail-open,
+       nunca bloquea).
     """
     if not store_product_id:
         return False
@@ -266,15 +292,11 @@ def puerta_update_obligatorio(
         _imprimir("[yellow]Espera un momento y vuelve a ejecutar el programa.[/yellow]")
         return True
 
-    # Último recurso: ventana de Descargas y actualizaciones.
+    # Último recurso: fallo del disparo (PowerShell bloqueado, WinRT, timeout).
+    # Fail-open: avisa, abre la Store y deja continuar con la versión actual.
     _imprimir(
-        f"[bold yellow]Hay una actualización obligatoria de {app} disponible "
-        "en Microsoft Store.[/bold yellow]"
+        f"[bold yellow]{app} no se pudo actualizar automáticamente; "
+        "se abrió la Store. Continúa con la versión actual.[/bold yellow]"
     )
-    _imprimir(
-        f"Se abrió la ventana de actualizaciones de la Store: actualiza "
-        f"{app} y vuelve a ejecutar el programa."
-    )
-    _imprimir("[grey70]No puedes continuar con esta versión.[/grey70]")
     abrir_tienda()
-    return True
+    return False
