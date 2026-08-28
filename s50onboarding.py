@@ -24,7 +24,7 @@ from pathlib import Path
 _logger = logging.getLogger(__name__)
 
 ONBOARDING_FILE = "onboarding.json"
-MANUAL_URL = "https://sage50eia.com/s50info"
+MANUAL_URL = "https://alfonsoautomatiza.github.io/Sage50bi/"
 SAGE50BI_URL = "https://www.alfonsoautomatiza.com/s50-bi"
 NOVEDADES_URL = "https://github.com/alfonsoautomatiza/S50info/releases"
 NOVEDADES_PAGE_URL = "https://alfonsoautomatiza.github.io/S50info/novedades/"

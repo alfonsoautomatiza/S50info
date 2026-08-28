@@ -16,8 +16,9 @@
 - Use `uv` for dependency management.
 - Do not use `pip` directly for project dependencies.
 - On Windows, use `.venv` as the normal project environment.
-- If checks/tests are run from Linux/WSL, use/create `.venvlinux`; do not recreate or modify the Windows `.venv` from Linux/WSL.
+- **On Linux/WSL, always use/create `.venvlinux` for any test, check, or agent command.** Never use or modify the Windows `.venv` from Linux/WSL.
 - For any Linux/WSL agent command, enforce `UV_PROJECT_ENVIRONMENT=.venvlinux` before `uv run`/`uv sync` to guarantee the Windows `.venv` is never touched.
+- **Entorno virtual obligatorio para Linux/WSL**: `.venv` está reservado para Windows. En todos los proyectos, siempre que se necesite correr pruebas, comprobaciones o desarrollo local en Linux/WSL, usar exclusivamente `UV_PROJECT_ENVIRONMENT=.venvlinux` (o borrar `.venv` antes de ejecutar `uv run`) para evitar conflictos de plataforma.
 
 ## Build workflow
 - Main build script: `c/build_exe.py`.

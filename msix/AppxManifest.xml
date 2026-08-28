@@ -6,7 +6,7 @@
          IgnorableNamespaces="uap rescap uap5">
   <Identity Name="InfoMSD.s50info"
             Publisher="CN=D75F3D07-BF68-4BB3-B36C-5A12A1A03277"
-            Version="2.1.8.0" />
+            Version="2.2.2.0" />
   <Properties>
     <DisplayName>s50info</DisplayName>
     <PublisherDisplayName>InfoMSD</PublisherDisplayName>

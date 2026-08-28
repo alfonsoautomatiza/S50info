@@ -53,12 +53,20 @@ def load_s50info_module(disable_usage_prompt=True, mock_pausa=True):
         "s50proceso": sys.modules.get("s50proceso"),
         "s50onboarding": sys.modules.get("s50onboarding"),
         "libupdatemsix": sys.modules.get("libupdatemsix"),
+        "libwertylog": sys.modules.get("libwertylog"),
+        "libwertyemail": sys.modules.get("libwertyemail"),
+        "libwertymail": sys.modules.get("libwertymail"),
+        "wertyfeedback": sys.modules.get("wertyfeedback"),
     }
     sys.modules["pysage50e"] = fake_pysage50e
     sys.modules["pysage50e.sage_debug_config"] = fake_sage_debug_config
     sys.modules["s50proceso"] = fake_proceso_module
     sys.modules["s50onboarding"] = MagicMock()
     sys.modules["libupdatemsix"] = MagicMock()
+    sys.modules["libwertylog"] = MagicMock()
+    sys.modules["libwertyemail"] = MagicMock()
+    sys.modules["libwertymail"] = MagicMock()
+    sys.modules["wertyfeedback"] = MagicMock()
     try:
         module = importlib.import_module("s50info")
     finally:
@@ -910,3 +918,25 @@ def test_export_command_resolver_error_propaga_limpio(tmp_path, monkeypatch):
     assert "No se pudieron resolver años" in result.stdout
     assert "Traceback" not in result.stdout
     module._record_successful_use_and_maybe_show_cta.assert_not_called()
+
+
+def test_feedback_command_sends_log_when_configured():
+    module, _, _, _ = load_s50info_module()
+
+    result = runner.invoke(module.app, ["feedback", "Mensaje de prueba"])
+
+    assert result.exit_code == 0
+    assert "Log enviado a soporte" in result.stdout
+
+
+def test_feedback_command_warns_without_support_email(monkeypatch):
+    module, _, _, _ = load_s50info_module()
+    monkeypatch.delenv("S50INFO_SUPPORT_EMAIL", raising=False)
+    feedback_mock = MagicMock()
+    feedback_mock.support_email = ""
+    module._get_feedback = lambda: feedback_mock
+
+    result = runner.invoke(module.app, ["feedback"])
+
+    assert result.exit_code == 0
+    assert "No está configurado el email de soporte" in result.stdout

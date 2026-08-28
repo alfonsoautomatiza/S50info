@@ -22,17 +22,32 @@ import s50onboarding
 from s50version import __version__ as S50INFO_VERSION
 from s50version import STORE_PRODUCT_ID
 
-# Carga resiliente de libupdatemsix (librería compartida en mislibrerias)
-try:
-    import libupdatemsix
-except ImportError:
+# Carga resiliente de librerías compartidas en mislibrerias (WSL y Windows)
+def _add_mislibrerias_to_path():
     for _libs in (
-        Path("d:/py/@produxion/@api/mislibrerias"),
-        Path("c:/py/@produxion/@api/mislibrerias"),
+        Path("/home/alfonso/py/mislibrerias"),
+        Path("P:/mislibrerias"),
     ):
         if _libs.is_dir():
             sys.path.insert(0, str(_libs))
             break
+
+
+# Carga resiliente de wertyfeedback (sistema compartido de informes de error)
+try:
+    import wertyfeedback
+except ImportError:
+    _add_mislibrerias_to_path()
+    try:
+        import wertyfeedback
+    except ImportError:
+        wertyfeedback = None
+
+# Carga resiliente de libupdatemsix (librería compartida en mislibrerias)
+try:
+    import libupdatemsix
+except ImportError:
+    _add_mislibrerias_to_path()
     try:
         import libupdatemsix
     except ImportError:
@@ -55,7 +70,7 @@ except Exception as e:
 # Activar DEBUG detallado si .env tiene DEBUG=True/Si/1
 _debug_active = configure_debug_logging()
 
-MANUAL_URL = os.getenv("MANUAL_URL", "https://sage50eia.com/s50info")
+MANUAL_URL = os.getenv("MANUAL_URL", "https://alfonsoautomatiza.github.io/Sage50bi/")
 SAGE50BI_URL = os.getenv("SAGE50BI_URL", "https://www.alfonsoautomatiza.com/s50-bi")
 USAGE_PROMPT_FIRST_USE = 5
 USAGE_PROMPT_INTERVAL = 20
@@ -72,11 +87,12 @@ app = typer.Typer(
     context_settings={"help_option_names": ["-h", "--help"]},
     help=(
         "S50Info - herramienta CLI para consultar, exportar y mantener SAGE50. "
-        "Usa los subcomandos `info`, `sql`, `export`, `run`, `reset`, `manual` y `version`."
+        "Usa los subcomandos `info`, `sql`, `export`, `run`, `reset`, `feedback`, `manual` y `version`."
     ),
 )
 
 _cwd_original = Path.cwd()
+_feedback = None
 
 
 def _app_state_dir() -> Path:
@@ -84,6 +100,24 @@ def _app_state_dir() -> Path:
     if appdata:
         return Path(appdata) / "s50info"
     return Path.home() / ".s50info"
+
+
+def _get_feedback():
+    """Crea el colector de feedback configurado para s50info."""
+    if wertyfeedback is None:
+        return None
+    return wertyfeedback.get_feedback(
+        app_name="s50info",
+        state_dir=_app_state_dir(),
+        support_email=os.getenv("S50INFO_SUPPORT_EMAIL", ""),
+    )
+
+
+def _send_feedback_error(exc: BaseException) -> None:
+    """Registra un error y, en modo interactivo, pregunta si enviar el log."""
+    if wertyfeedback is None:
+        return
+    wertyfeedback.send_on_error(_feedback, exc)
 
 
 def _ensure_config_path() -> Path:
@@ -358,6 +392,8 @@ def main(
         raise typer.Exit(1)
 
     _inicializar_directorio_trabajo()
+    global _feedback
+    _feedback = _get_feedback()
     s50onboarding.mostrar_if_necesario(_app_state_dir())
     if ctx.invoked_subcommand is None:
         rprint(f"[grey70]Directorio de trabajo: {Path.cwd()}[/grey70]")
@@ -377,6 +413,7 @@ def main(
     except Exception as exc:
         logging.error(exc)
         rprint(f"[bold red]Error durante el proceso:[/bold red] {escape(str(exc))}")
+        _send_feedback_error(exc)
         raise typer.Exit(1)
 
 
@@ -416,6 +453,7 @@ def info_cmd(
     except Exception as exc:
         logging.error(exc)
         rprint(f"[bold red]Error durante el proceso:[/bold red] {escape(str(exc))}")
+        _send_feedback_error(exc)
         raise typer.Exit(1)
 
 
@@ -569,6 +607,7 @@ def export_cmd(
     except Exception as exc:
         logging.error(exc)
         rprint(f"[bold red]Error durante el proceso:[/bold red] {escape(str(exc))}")
+        _send_feedback_error(exc)
         raise typer.Exit(1)
     if success is True:
         _record_successful_use_and_maybe_show_cta()
@@ -643,6 +682,7 @@ def run_cmd(
                 rprint(f"[bold red]Error al ejecutar {script_file.name}:[/bold red] {exc}")
                 print(traceback.format_exc())
                 logging.error(f"Error ejecutando script externo: {exc}")
+                _send_feedback_error(exc)
         if failed:
             raise typer.Exit(1)
         _record_successful_use_and_maybe_show_cta()
@@ -676,6 +716,7 @@ def run_cmd(
         logging.error(f"Error ejecutando script externo: {exc}")
         print(exc)
         print(traceback.format_exc())
+        _send_feedback_error(exc)
         raise typer.Exit(1)
 
 
@@ -685,6 +726,43 @@ def reset_cmd():
     if proceso_obj is None:
         raise typer.Exit()
     proceso_obj.reset_log()
+
+
+@app.command("feedback")
+def feedback_cmd(
+    mensaje: str | None = typer.Argument(
+        None,
+        help="Mensaje opcional para incluir en el informe.",
+    ),
+):
+    """Envía el log de la aplicación a soporte (requiere S50INFO_SUPPORT_EMAIL)."""
+    _inicializar_directorio_trabajo()
+    feedback = _get_feedback()
+    if feedback is None:
+        rprint(
+            "[yellow]Aviso:[/yellow] El sistema de feedback no está disponible. "
+            "Comprueba que las librerías Werty están accesibles."
+        )
+        raise typer.Exit()
+
+    if not feedback.support_email:
+        rprint(
+            "[yellow]Aviso:[/yellow] No está configurado el email de soporte. "
+            "Define la variable de entorno S50INFO_SUPPORT_EMAIL."
+        )
+        raise typer.Exit()
+
+    enviado = feedback.ask_and_send_log(
+        context=None,
+        body=mensaje,
+        ask_permission_callback=lambda: wertyfeedback.console_ask_permission(
+            "¿Quieres enviar el log a soporte"
+        ),
+    )
+    if enviado:
+        rprint("[green]Log enviado a soporte.[/green]")
+    else:
+        rprint("[grey70]No se envió el log.[/grey70]")
 
 
 def _cli_main() -> None:

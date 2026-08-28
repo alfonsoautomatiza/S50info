@@ -12,7 +12,7 @@ from unittest.mock import MagicMock
 import pytest
 
 # Resolver directorio de la librería compartida y añadir a sys.path
-_lib_dir = Path(__file__).resolve().parents[3] / "@api" / "mislibrerias"
+_lib_dir = Path("/home/alfonso/py/mislibrerias")
 if _lib_dir.is_dir():
     sys.path.insert(0, str(_lib_dir))
 
