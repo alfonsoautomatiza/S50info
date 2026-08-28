@@ -34,4 +34,6 @@ c/RELEASE/_internal/
 # Local tooling
 .codegraph/
 .licwerty/
+.engram/
+.engram.toml
 msix/s50info Installer.exe
