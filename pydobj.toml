@@ -32,7 +32,7 @@ files = [
 [[external_libs.groups]]
 name = "pysage50e"
 flatten = false
-dir = "d:\\py\\@produxion\\@api\\pysage50e\\pysage50e"
+dir = "P:\\api\\pysage50e\\pysage50e"
 files = ["*.py"]
 
 [[extra_copy]]

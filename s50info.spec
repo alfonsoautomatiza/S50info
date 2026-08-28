@@ -61,8 +61,8 @@ def safe_collect_submodules(package_name, **kwargs):
 
 
 external_paths = existing_paths(
-    project_root.parent / "@api" / "mislibrerias",
-    project_root.parent / "@api" / "api_sage50",
+    Path("P:/mislibrerias"),
+    Path("P:/api/pysage50e"),
 )
 
 binaries = collect_local_binaries(spec_root)
@@ -92,8 +92,10 @@ hiddenimports = [
     "json",
     "libupdatemsix",
     "libwertyconfig",
+    "libwertyemail",
     "libwertylog",
     "libwertymail",
+    "wertyfeedback",
     "logging.handlers",
     "lxml._elementpath",
     "lxml.etree",
