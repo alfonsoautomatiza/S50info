@@ -1,0 +1,155 @@
+name: PR Validation
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: read
+  issues: read
+
+jobs:
+  check-issue-ref:
+    name: Check Issue Reference
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const rawBody = context.payload.pull_request.body || '';
+            // Strip fenced code blocks and inline code spans so that examples
+            // like ```Closes #999``` inside a markdown code block do NOT
+            // satisfy the issue-reference gate (R4-012).
+            const body = rawBody
+              .replace(/```[\s\S]*?```/g, '')
+              .replace(/`[^`\n]*`/g, '');
+            const re = /(?:^|[\s(>])(Closes|Fixes|Resolves)\s+#(\d+)\b/gi;
+            const matches = [...body.matchAll(re)];
+            if (matches.length === 0) {
+              core.setFailed(
+                'PR body must contain one of: "Closes #N", "Fixes #N" or "Resolves #N".'
+              );
+            }
+
+  check-issue-approved:
+    name: Check Issue Has status:approved
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const rawBody = context.payload.pull_request.body || '';
+            // Strip fenced code blocks and inline code spans so that examples
+            // inside markdown code do NOT satisfy the issue-link gate (R4-012).
+            // The keyword must be preceded by start-of-line, whitespace, '(',
+            // or '>'. We do NOT exclude natural-language negation ("does not
+            // Closes #5") at the regex level — the gate is context-independent
+            // because the status:approved check below treats every linked
+            // issue uniformly: if a contributor writes "does not Closes #5"
+            // the gate still requires issue #5 to carry status:approved,
+            // which is a safe failure mode (false-positive on the regex,
+            // never a bypass of the approval check).
+            const body = rawBody
+              .replace(/```[\s\S]*?```/g, '')
+              .replace(/`[^`\n]*`/g, '');
+            const re = /(?:^|[\s(>])((?:Closes|Fixes|Resolves))\s+#(\d+)\b/gi;
+            const matches = [...body.matchAll(re)];
+            if (matches.length === 0) {
+              core.setFailed('No issue reference found in PR body.');
+              return;
+            }
+            // ALL linked issues must be approved; one unapproved #N blocks the merge.
+            for (const m of matches) {
+              const issueNumber = parseInt(m[2], 10);
+              try {
+                const { data: issue } = await github.rest.issues.get({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issueNumber,
+                });
+                const labels = (issue.labels || []).map(l => l.name);
+                if (!labels.includes('status:approved')) {
+                  const msg = `Issue #${issueNumber} must carry the "status:approved" label before this PR can merge. Current labels: ${labels.join(', ') || '(none)'}`;
+                  core.setFailed(msg);
+                  return;
+                }
+              } catch (err) {
+                core.setFailed(
+                  `Could not fetch issue #${issueNumber}: ${err.message}. Verify the issue exists and the GITHUB_TOKEN has access.`
+                );
+                return;
+              }
+            }
+
+  check-type-label:
+    name: Check PR Has Exactly One type:* Label
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+            });
+            const typeLabels = (pr.labels || [])
+              .map(l => l.name)
+              .filter(n => n.startsWith('type:'));
+            if (typeLabels.length === 0) {
+              core.setFailed(
+                'PR must have exactly one type:* label. Allowed: type:bug, type:feature, type:docs, type:refactor, type:chore, type:breaking-change.'
+              );
+            } else if (typeLabels.length > 1) {
+              core.setFailed(
+                `PR has ${typeLabels.length} type:* labels (${typeLabels.join(', ')}). Must have exactly one.`
+              );
+            }
+
+  check-conventional-commits:
+    name: Check Conventional Commits
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: commits } = await github.rest.pulls.listCommits({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+            });
+            const re = /^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([a-z0-9._-]+\))?!?: .+/;
+            // Skip merge commits (their first line is "Merge ..." not authored content).
+            // Also strip trailing CR for CRLF-normalized Windows-authored commits.
+            const offenders = commits
+              .map(c => c.commit.message.split('\n')[0].replace(/\r$/, ''))
+              .filter(msg => !re.test(msg))
+              // Merge commits are auto-generated by GitHub and cannot follow CC.
+              .filter(msg => !/^Merge (branch|pull request)/i.test(msg));
+            if (offenders.length) {
+              core.setFailed(
+                'These commits do not follow Conventional Commits:\n  - ' +
+                  offenders.join('\n  - ')
+              );
+            }
+
+  pytest:
+    name: Tests (pytest)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: latest
+      - name: Set up Python
+        run: uv python install 3.13
+      - name: Sync dependencies (Linux/WSL env)
+        run: UV_PROJECT_ENVIRONMENT=.venvlinux uv sync --frozen
+      - name: Run tests
+        run: UV_PROJECT_ENVIRONMENT=.venvlinux uv run pytest -q

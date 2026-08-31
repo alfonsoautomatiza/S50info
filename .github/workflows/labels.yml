@@ -1,0 +1,59 @@
+name: Sync Labels
+
+on:
+  push:
+    branches: [main, update]
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  labels:
+    name: Ensure Labels Exist
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const desired = [
+              { name: 'status:approved',  color: '0e8a16', description: 'Issue aprobada y lista para implementación (gate de PR)' },
+              { name: 'status:blocked',    color: 'b60205', description: 'Issue bloqueada por dependencia externa' },
+              { name: 'status:wip',        color: 'fbca04', description: 'Issue en trabajo activo (asignada, branch abierto)' },
+              { name: 'type:bug',          color: 'd73a4a', description: 'Bug report' },
+              { name: 'type:feature',      color: 'a2eeef', description: 'Nueva feature' },
+              { name: 'type:docs',         color: '0075ca', description: 'Cambios solo de documentación' },
+              { name: 'type:refactor',     color: 'cfd3d7', description: 'Refactor sin cambio funcional' },
+              { name: 'type:chore',        color: 'cccccc', description: 'Mantenimiento, tooling, build, deps' },
+              { name: 'type:breaking-change', color: 'b60205', description: 'Cambio breaking (CLI, schema, build)' },
+              { name: 'priority:high',     color: 'b60205', description: 'Prioridad alta' },
+              { name: 'priority:medium',   color: 'fbca04', description: 'Prioridad media' },
+              { name: 'priority:low',      color: '0e8a16', description: 'Prioridad baja' },
+              { name: 'rdd:bound',         color: '5319e7', description: 'Defecto bajo recibo de review (RDD)' },
+            ];
+            const { data: existing } = await github.rest.issues.listLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100,
+            });
+            const existingByName = new Map(existing.map(l => [l.name, l]));
+            for (const label of desired) {
+              if (existingByName.has(label.name)) {
+                await github.rest.issues.updateLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: label.name,
+                  color: label.color,
+                  description: label.description,
+                });
+              } else {
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: label.name,
+                  color: label.color,
+                  description: label.description,
+                });
+              }
+            }
+            core.info(`Synced ${desired.length} labels.`);
