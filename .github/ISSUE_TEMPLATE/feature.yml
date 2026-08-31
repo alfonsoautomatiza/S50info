@@ -1,0 +1,61 @@
+name: Feature Request
+description: Proponer una nueva capacidad para s50info (CLI SAGE50).
+title: "[Feature]: "
+labels: ["type:feature"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Antes de abrir una feature, verificá que:
+        - No exista ya en `manual/comandos.md` o `manual/scripts.md`.
+        - No esté listada como no-objetivo en `PRD.md` (§ 4.2).
+        - Encaje en el flujo CLI / exportador / scripts (no en BI / UI visual).
+
+  - type: textarea
+    id: problema
+    attributes:
+      label: Problema que resuelve
+      description: ¿Qué dolor del usuario ataca esta feature?
+    validations:
+      required: true
+
+  - type: textarea
+    id: propuesta
+    attributes:
+      label: Propuesta de implementación
+      description: Forma CLI, subcomando nuevo, flag, etc. Si tenés un sketch de comando, mejor.
+      placeholder: |
+        Subcomando nuevo: `s50info <cmd>`
+        O flag nuevo: `s50info export --<flag>`
+
+        Ejemplo de uso:
+        ```bash
+        uv run s50info <cmd> --<flag> valor
+        ```
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternativas
+    attributes:
+      label: Alternativas consideradas
+      description: Por qué esta y no otras.
+
+  - type: dropdown
+    id: impacto
+    attributes:
+      label: Impacto estimado en líneas
+      options:
+        - Pequeño (< 100 líneas)
+        - Mediano (100-400 líneas, una PR)
+        - Grande (> 400 líneas, requiere chain)
+        - No sé / depende de diseño
+    validations:
+      required: true
+
+  - type: textarea
+    id: backward_compat
+    attributes:
+      label: Compatibilidad con versiones previas
+      description: ¿Rompe la API CLI existente? ¿Cambia defaults?

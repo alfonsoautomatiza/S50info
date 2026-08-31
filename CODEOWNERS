@@ -1,0 +1,37 @@
+# CODEOWNERS — S50Info
+# Reviewers requeridos por path. El último match gana.
+# Formato: pattern @owner [@owner ...]
+
+# Default: el maintainer revisa todo.
+*                               @wertyMSD
+
+# Código de producción crítico (requiere review explícito del maintainer).
+/s50info.py                     @wertyMSD
+/s50proceso.py                  @wertyMSD
+/s50setup.py                    @wertyMSD
+/s50onboarding.py               @wertyMSD
+/s50exportador_resultados.py    @wertyMSD
+/s50script.py                   @wertyMSD
+/s50version.py                  @wertyMSD
+
+# Build, Cython, MSIX.
+/c/                             @wertyMSD
+/msix/                          @wertyMSD
+/pydobj.toml                    @wertyMSD
+/s50info.spec                   @wertyMSD
+
+# Dependencias y configuración de proyecto.
+/pyproject.toml                 @wertyMSD
+/uv.lock                        @wertyMSD
+
+# Documentación técnica.
+/manual/                        @wertyMSD
+/docs/                          @wertyMSD
+
+# Tests.
+/test/                          @wertyMSD
+
+# Workflows de CI y templates.
+/.github/                       @wertyMSD
+/CONTRIBUTING.md                @wertyMSD
+/CODEOWNERS                     @wertyMSD
