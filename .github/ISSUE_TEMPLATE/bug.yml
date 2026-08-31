@@ -1,0 +1,101 @@
+name: Bug Report
+description: Reportar un defecto reproducible de s50info (CLI SAGE50).
+title: "[Bug]: "
+labels: ["type:bug"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por reportar un bug. Completá todos los campos.
+        Las issues de bug requieren evidencia de reproducción antes de pasar a `status:approved`.
+
+  - type: input
+    id: comando
+    attributes:
+      label: Comando ejecutado
+      description: El comando exacto que produce el bug.
+      placeholder: 'uv run s50info sql "select * from #clientes"'
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Versión de s50info
+      description: Salida de `uv run s50info version`.
+      placeholder: "2.2.2"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: plataforma
+    attributes:
+      label: Plataforma
+      description: Dónde lo estás corriendo.
+      options:
+        - Windows 11
+        - Windows 10
+        - WSL2 (Ubuntu)
+        - Linux nativo
+        - Otro (especificar en descripción)
+    validations:
+      required: true
+
+  - type: textarea
+    id: comportamiento_esperado
+    attributes:
+      label: Comportamiento esperado
+      description: Qué esperabas que pasara.
+    validations:
+      required: true
+
+  - type: textarea
+    id: comportamiento_actual
+    attributes:
+      label: Comportamiento actual
+      description: Qué pasó en realidad. Pegá el output completo.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduccion
+    attributes:
+      label: Pasos para reproducir
+      description: 1-2-3 numerados, copy-pasteables.
+      placeholder: |
+        1. Ejecutar `...`
+        2. Conectar a la base `...`
+        3. Correr el comando `...`
+    validations:
+      required: true
+
+  - type: textarea
+    id: entorno
+    attributes:
+      label: Entorno y evidencia
+      description: SAGE50 instalado, versión, base de datos afectada, logs relevantes. **Sanitizá credenciales y nombres reales**.
+      placeholder: |
+        - SAGE50: <versión>
+        - Instancia SQL Server: <host>:<puerto>
+        - Base afectadas: <código de comunes>
+        - Logs: <ruta o pegar excerpt>
+    validations:
+      required: true
+
+  - type: textarea
+    id: workarounds
+    attributes:
+      label: Workarounds conocidos (opcional)
+      description: Si encontraste una manera de evitarlo mientras tanto.
+
+  - type: checkboxes
+    id: privacidad
+    attributes:
+      label: Pre-submission privacy review
+      description: Verificá que el body no contiene datos sensibles antes de enviar.
+      options:
+        - label: Reemplacé nombres de proyecto reales por `<project-name>`
+        - label: Reemplacé usernames por `<user>` o `/home/<user>`
+        - label: Reemplacé hosts por `<host>:<port>`
+        - label: Reemplacé tokens / passwords por `<token>` / `<password>`
