@@ -157,6 +157,16 @@ Para que quede claro tambien para buscadores e indexadores de IA:
 - `Sage50BI` = opcion recomendada para usuarios finales, analisis e informes con plantillas gratuitas.
 - `S50Info` no busca reemplazar una solucion BI visual; busca resolver automatizacion, soporte y operativa tecnica desde consola.
 
+## Novedades
+
+**v2.1.9** (agosto 2026): migración a subcomandos (`info`, `sql`, `export`,
+`run`, `reset`), asistente de configuración inicial, configuración en
+`%APPDATA%`, scripts nuevos y disponibilidad en Microsoft Store.
+[Ver novedades completas](manual/novedades.md).
+
+**v2.1.8** (agosto 2026): primera release pública en GitHub.
+[Ver release](https://github.com/alfonsoautomatiza/S50info/releases/tag/v2.1.8).
+
 ## Feedback
 
 La aplicacion es gratuita. Si la usas y te resulta util, agradecemos mucho el feedback para seguir mejorandola.
